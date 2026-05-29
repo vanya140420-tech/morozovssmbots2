@@ -1,0 +1,8 @@
+{
+  "name": "morozov-smm-bots",
+  "version": "1.0.0",
+  "description": "Платформа MOROZOV SMM для Telegram",
+  "dependencies": {
+    "firebase": "^10.8.0"
+  }
+}
