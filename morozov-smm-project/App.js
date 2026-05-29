@@ -1082,7 +1082,7 @@ export default function App() {
   // 📦 МОДУЛЬ 9: ВІЗУАЛЬНА ЧАСТИНА (RENDER HTML / ІНТЕРФЕЙС)
   // ============================================================================
 
-return (
+ return (
     <div className="h-[100dvh] md:h-screen w-full bg-[#0A0F1D] text-white flex overflow-hidden font-sans selection:bg-cyan-500/30 relative">
       {renderToast()}
 
@@ -2438,4 +2438,18 @@ return (
       )}
     </div>
   );
+}
+
+// --- АВТОМАТИЧНИЙ ЗАПУСК ДЛЯ VERCEL ---
+// Цей блок коду дає команду браузеру намалювати інтерфейс на реальному сайті.
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  setTimeout(() => {
+    const rootElement = document.getElementById('root');
+    // Перевіряємо, чи корінь порожній (щоб не малювати двічі)
+    if (rootElement && rootElement.childElementCount === 0) {
+      import('react-dom/client').then(({ createRoot }) => {
+        createRoot(rootElement).render(<App />);
+      }).catch(err => console.error("Помилка рендерингу:", err));
+    }
+  }, 100);
 }
