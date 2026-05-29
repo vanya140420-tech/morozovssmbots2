@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOROZOV SMM | Платформа Автоворонок</title>
+    <title>MOROZOV SMM | Платформа</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Import Map для загрузки библиотек -->
     <script type="importmap">
     {
       "imports": {
@@ -21,8 +21,6 @@
       }
     }
     </script>
-
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <style>
         ::-webkit-scrollbar { width: 8px; }
@@ -35,17 +33,6 @@
 <body>
     <div id="root"></div>
 
-    <!-- ТУТ МЫ ЗАПУСКАЕМ REACT ДЛЯ VERCEL -->
     <script type="text/babel" data-type="module" src="./App.js"></script>
-        import React from 'react';
-        import { createRoot } from 'react-dom/client';
-        import App from './App.jsx';
-
-        const rootElement = document.getElementById('root');
-        if (rootElement) {
-            const root = createRoot(rootElement);
-            root.render(<App />);
-        }
-    </script>
 </body>
 </html>
