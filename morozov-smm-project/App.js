@@ -861,37 +861,95 @@ export default function App() {
   const renderToast = () => {
     if (!toastMessage) return null;
     return (
-      <div className="fixed bottom-6 right-6 z-[100] animate-in slide-in-from-bottom-5 fade-in duration-300 pointer-events-none">
-        <div className={`flex items-center gap-3 px-5 py-4 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border backdrop-blur-xl ${toastMessage.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' : toastMessage.type === 'info' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400'}`}>
-          {toastMessage.type === 'error' ? <ShieldAlert size={20} /> : toastMessage.type === 'info' ? <Loader2 size={20} className="animate-spin" /> : <CheckCircle2 size={20} />}
-          <span className="font-medium text-sm tracking-wide">{toastMessage.text}</span>
+      <div className="fixed bottom-4 left-4 right-4 md:left-auto md:bottom-6 md:right-6 z-[100] animate-in slide-in-from-bottom-5 fade-in duration-300 pointer-events-none">
+        <div className={`flex items-center justify-center md:justify-start gap-3 px-5 py-4 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border backdrop-blur-xl w-full md:w-auto ${toastMessage.type === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-400' : toastMessage.type === 'info' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400'}`}>
+          {toastMessage.type === 'error' ? <ShieldAlert size={20} className="shrink-0" /> : toastMessage.type === 'info' ? <Loader2 size={20} className="animate-spin shrink-0" /> : <CheckCircle2 size={20} className="shrink-0" />}
+          <span className="font-medium text-sm tracking-wide text-center md:text-left">{toastMessage.text}</span>
         </div>
       </div>
     );
   };
 
-  const generateId = () => `ID${(users.map(u => parseInt(u.id.replace('ID', '')) || 0).reduce((a,b)=>Math.max(a,b), 0)) + 1}`;
-  const handleAuth = (e) => {
-    e.preventDefault(); setAuthError(''); const emailLower = authForm.email.toLowerCase();
+  // РЕАЛЬНА FIREBASE АВТОРИЗАЦІЯ
+  const handleAuth = async (e) => {
+    e.preventDefault(); 
+    setAuthError(''); 
+    const emailLower = authForm.email.toLowerCase();
+    
     if (!isLoginMode && !authForm.agreed) return setAuthError('Ви повинні погодитись з усіма умовами та політиками.');
 
-    if (isLoginMode) {
-      const user = users.find(u => u.email === emailLower && u.password === authForm.password);
-      if (user) { saveStateToDb({ currentUser: user }); setActiveTab('home'); showToast('Успішний вхід'); setIsAuthPageOpen(false); } else setAuthError('Невірна email адреса або пароль');
-    } else {
-      if (users.find(u => u.email === emailLower)) return setAuthError('Цей Email вже використовується');
-      const isFounder = ['vanaslinavskij@gmail.com', 'stasznam44@gmail.com'].includes(emailLower);
-      const newUser = { id: generateId(), name: authForm.name, email: emailLower, password: authForm.password, role: isFounder ? 'founder' : 'user', status: isFounder ? '👑 Founder' : '🟢 Starter', plan: isFounder ? 'Unlimited' : 'Starter', planStartDate: new Date().toISOString().split('T')[0], planExpiry: isFounder ? '2099-12-31' : '', autoRenew: true, refundRequested: false };
-      saveStateToDb({ users: [...users, newUser], currentUser: newUser }); setActiveTab('home'); showToast('Акаунт створено!'); setIsAuthPageOpen(false);
+    try {
+        if (isLoginMode) {
+            // Реальний логін через Firebase
+            const userCredential = await signInWithEmailAndPassword(auth, emailLower, authForm.password);
+            
+            // Шукаємо юзера в нашій базі (Firestore/Local)
+            let user = users.find(u => u.email === emailLower);
+            if (!user) {
+                const isFounder = ['vanaslinavskij@gmail.com', 'stasznam44@gmail.com'].includes(emailLower);
+                user = { id: userCredential.user.uid, name: 'Користувач', email: emailLower, role: isFounder ? 'founder' : 'user', status: isFounder ? '👑 Founder' : '🟢 Starter', plan: isFounder ? 'Unlimited' : 'Starter', autoRenew: true, refundRequested: false };
+                saveStateToDb({ users: [...users, user] });
+            }
+            saveStateToDb({ currentUser: user }); 
+            setActiveTab('home'); 
+            showToast('Успішний вхід'); 
+            setIsAuthPageOpen(false);
+        } else {
+            // Реальна реєстрація через Firebase
+            const userCredential = await createUserWithEmailAndPassword(auth, emailLower, authForm.password);
+            const isFounder = ['vanaslinavskij@gmail.com', 'stasznam44@gmail.com'].includes(emailLower);
+            
+            const newUser = { 
+                id: userCredential.user.uid, // Використовуємо реальний Firebase UID
+                name: authForm.name, 
+                email: emailLower, 
+                password: authForm.password, // У продакшені пароль в базі не зберігається, але лишаємо для сумісності з вашою адмінкою
+                role: isFounder ? 'founder' : 'user', 
+                status: isFounder ? '👑 Founder' : '🟢 Starter', 
+                plan: isFounder ? 'Unlimited' : 'Starter', 
+                planStartDate: new Date().toISOString().split('T')[0], 
+                planExpiry: isFounder ? '2099-12-31' : '', 
+                autoRenew: true, 
+                refundRequested: false 
+            };
+            
+            saveStateToDb({ users: [...users, newUser], currentUser: newUser }); 
+            setActiveTab('home'); 
+            showToast('Акаунт створено та підключено до БД!'); 
+            setIsAuthPageOpen(false);
+        }
+    } catch (error) {
+        console.error("Auth Error:", error);
+        if (error.code === 'auth/email-already-in-use') setAuthError('Цей Email вже зареєстровано.');
+        else if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') setAuthError('Невірна email адреса або пароль.');
+        else if (error.code === 'auth/weak-password') setAuthError('Пароль має бути не менше 6 символів.');
+        else setAuthError('Помилка авторизації. Спробуйте пізніше.');
     }
   };
 
   const handleNavClick = (tab) => { setActiveTab(tab); setIsSidebarOpen(false); setIsAuthPageOpen(false); setIsBuilderOpen(false); if (window.innerWidth >= 768) setIsSidebarCollapsed(true); };
-  const handleLogout = () => { saveStateToDb({ currentUser: null }); setActiveTab('home'); };
   
-  const saveSettings = (e) => { e.preventDefault(); const updatedUser = { ...currentUser, name: settingsForm.name, password: settingsForm.password }; saveStateToDb({ users: users.map(u => u.id === currentUser.id ? updatedUser : u), currentUser: updatedUser }); showToast('Налаштування успішно збережені'); };
+  const handleLogout = async () => { 
+      try { await signOut(auth); } catch(e) {} // Реальний вихід з Firebase
+      saveStateToDb({ currentUser: null }); 
+      setActiveTab('home'); 
+  };
+  
+  const saveSettings = (e) => { 
+      e.preventDefault(); 
+      const updatedUser = { ...currentUser, name: settingsForm.name };
+      if (settingsForm.password) updatedUser.password = settingsForm.password;
+      saveStateToDb({ users: users.map(u => u.id === currentUser.id ? updatedUser : u), currentUser: updatedUser }); 
+      showToast('Налаштування успішно збережені'); 
+  };
   
   const handleWayForPayCheckout = () => { 
+      // АРХІТЕКТУРА РЕАЛЬНОЇ ОПЛАТИ:
+      // Тут має бути виклик WayForPay Widget або редірект на paymentUrl.
+      // Після оплати WayForPay надсилає Webhook на ваш бекенд (наприклад у папку /api/payment), 
+      // який підтверджує транзакцію та оновлює статус користувача в базі даних.
+      // Оскільки серверної частини для оплат зараз немає, залишаємо симуляцію для демонстрації:
+      
       const url = plansConfig[checkoutPlan]?.paymentUrl;
       if (url) window.open(url, '_blank');
       
@@ -918,6 +976,7 @@ export default function App() {
                                   <div style="background-color: #0B1120; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #1F2937;">
                                       <p style="margin: 0; color: #fff;">Сума: <b>₴${plansConfig[checkoutPlan]?.price}</b></p>
                                       <p style="margin: 5px 0 0 0; color: #fff;">План: <b>${checkoutPlan}</b></p>
+                                      <p style="margin: 5px 0 0 0; color: #fff;">Діє до: <b>${new Date(formattedExpiry).toLocaleDateString('uk-UA')}</b></p>
                                   </div>
                                   <p style="color: #9CA3AF; font-size: 14px;">Тепер ви можете створювати ще більше ефективних воронок.</p>
                                   <br/>
