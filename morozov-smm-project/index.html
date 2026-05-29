@@ -3,30 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOROZOV SMM</title>
+    <title>MOROZOV SMM | Платформа Автоворонок</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Подключаем React и ReactDOM напрямую без importmap для 100% стабильности -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Подключаем Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Подключаем Firebase SDK в виде модулей -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // Делаем Firebase доступным глобально для App.jsx
-        window.FirebaseApp = { initializeApp };
-        window.FirebaseAuth = { getAuth, signInAnonymously, onAuthStateChanged, signOut };
-        window.FirebaseFirestore = { getFirestore, doc, setDoc, getDoc, collection, addDoc };
+    <!-- Import Map для загрузки библиотек -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "lucide-react": "https://esm.sh/lucide-react@0.294.0?external=react",
+        "recharts": "https://esm.sh/recharts@2.10.3?external=react,react-dom",
+        "firebase/app": "https://esm.sh/firebase@10.8.0/app",
+        "firebase/auth": "https://esm.sh/firebase@10.8.0/auth",
+        "firebase/firestore": "https://esm.sh/firebase@10.8.0/firestore"
+      }
+    }
     </script>
 
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <style>
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0B1120; }
@@ -38,7 +35,17 @@
 <body>
     <div id="root"></div>
 
-    <!-- Загружаем и компилируем App.jsx -->
-    <script type="text/babel" data-type="module" src="./App.jsx"></script>
+    <!-- ТУТ МЫ ЗАПУСКАЕМ REACT ДЛЯ VERCEL -->
+    <script type="text/babel" data-type="module">
+        import React from 'react';
+        import { createRoot } from 'react-dom/client';
+        import App from './App.jsx';
+
+        const rootElement = document.getElementById('root');
+        if (rootElement) {
+            const root = createRoot(rootElement);
+            root.render(<App />);
+        }
+    </script>
 </body>
 </html>
