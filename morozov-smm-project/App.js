@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createRoot } from 'react-dom/client';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from 'firebase/firestore';
@@ -15,6 +14,10 @@ import {
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
+
+// ============================================================================
+// 📦 МОДУЛЬ 1: ІНІЦІАЛІЗАЦІЯ БАЗИ ДАНИХ ТА MOCK ДАНІ
+// ============================================================================
 
 // --- ІНІЦІАЛІЗАЦІЯ БАЗИ ДАНИХ (FIREBASE / GOOGLE) ---
 const firebaseConfig = {
@@ -73,6 +76,10 @@ const ANALYTICS_DATA_WEEK = [
   { name: 'Пт', users: 78, interactions: 880 }, { name: 'Сб', users: 23, interactions: 380 },
   { name: 'Нд', users: 94, interactions: 1130 },
 ];
+
+// ============================================================================
+// 📦 МОДУЛЬ 2: СПІЛЬНІ КОМПОНЕНТИ (FOOTER, MODALS, ЮРИДИЧНІ ДОКУМЕНТИ)
+// ============================================================================
 
 // --- ПЕРЕИСПОЛЬЗУЕМЫЕ КОМПОНЕНТЫ ---
 const AppFooter = ({ modals, info }) => (
@@ -296,6 +303,10 @@ const ContactsContent = ({ info }) => (
   </div>
 );
 
+// ============================================================================
+// 📦 МОДУЛЬ 3: ГОЛОВНИЙ КОМПОНЕНТ ДОДАТКУ ТА СТЕЙТИ
+// ============================================================================
+
 // --- MAIN APP COMPONENT ---
 export default function App() {
   const [fbReady, setFbReady] = useState(false);
@@ -370,6 +381,10 @@ export default function App() {
     </>
   );
 
+  // ============================================================================
+  // 📦 МОДУЛЬ 4: FIREBASE ТА ГЛОБАЛЬНІ ФУНКЦІЇ
+  // ============================================================================
+
   // --- FIREBASE INIT ---
   useEffect(() => {
     if (!auth) return;
@@ -438,6 +453,10 @@ export default function App() {
       const text = `💰 <b>Нова покупка на платформі!</b>\n\n👤 <b>Користувач:</b> ${user.name}\n📧 <b>Email:</b> ${user.email}\n💳 <b>Придбано тариф:</b> ${plan}`;
       try { await fetch(`https://api.telegram.org/bot${token}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }) }); } catch (e) {}
   };
+
+  // ============================================================================
+  // 📦 МОДУЛЬ 5: ДВИЖОК TELEGRAM БОТІВ
+  // ============================================================================
 
   // Вимикаємо локальний браузерний Polling, оскільки тепер працюємо через Webhooks на сервері Vercel
   useEffect(() => { return () => { Object.values(runnersRef.current).forEach(r => r.abortController?.abort()); }; }, []);
@@ -736,6 +755,10 @@ export default function App() {
     if (!matched) await sendTelegramAPI(tokenStr, chatId, { text: "Команду не розпізнано." });
   };
 
+  // ============================================================================
+  // 📦 МОДУЛЬ 6: СИМУЛЯТОР ТЕЛЕФОНУ
+  // ============================================================================
+
   const sendPreviewMsg = async (overrideText = null) => {
       const textToProcess = (overrideText || previewInput).trim().toLowerCase(); if(!textToProcess) return;
       setPreviewChat(prev => [...prev, { sender: 'user', text: overrideText || previewInput }]); if(!overrideText) setPreviewInput('');
@@ -829,6 +852,10 @@ export default function App() {
           }, 500);
       }
   };
+
+  // ============================================================================
+  // 📦 МОДУЛЬ 7: АВТОРИЗАЦІЯ, ОПЛАТА ТА ПРОФІЛЬ
+  // ============================================================================
 
   const showToast = (text, type = 'success') => { setToastMessage({ text, type }); setTimeout(() => setToastMessage(null), 3000); };
   const renderToast = () => {
@@ -943,6 +970,10 @@ export default function App() {
     }
   };
 
+  // ============================================================================
+  // 📦 МОДУЛЬ 8: ПАНЕЛЬ АДМІНІСТРАТОРА ТА КОНСТРУКТОР ВОРОНОК
+  // ============================================================================
+
   const adminDeleteUser = (userId) => { if (userId === 'ID0' || userId === currentUser.id) return showToast('Видалення цього акаунту заборонено', 'error'); const userToDelete = users.find(u => u.id === userId); if (currentUser.role === 'admin' && userToDelete?.role === 'founder') return showToast('У вас немає прав для видалення Founder', 'error'); if(window.confirm(`Точно видалити користувача ${userToDelete?.name}?`)) { saveStateToDb({ users: users.filter(u => u.id !== userId), bots: bots.filter(b => b.userId !== userId) }); showToast('Користувач та його воронки повністю видалені', 'error'); } };
   const adminPauseUserBots = (userId) => { if (window.confirm(`Зупинити повністю всіх ботів цього користувача?`)) { saveStateToDb({ bots: bots.map(b => b.userId === userId ? { ...b, status: 'Пауза' } : b) }); showToast(`Боти користувача переведені у сплячий режим`, 'success'); } };
   const adminSaveUser = (e) => { e.preventDefault(); const updatedUsers = users.map(u => u.id === adminEditingUser.id ? { ...u, name: adminEditingUser.name, role: adminEditingUser.role, plan: adminEditingUser.plan, planStartDate: adminEditingUser.planStartDate, planExpiry: adminEditingUser.planExpiry, status: adminEditingUser.status || u.status } : u); saveStateToDb({ users: updatedUsers }); if (adminEditingUser.id === currentUser.id) saveStateToDb({ currentUser: updatedUsers.find(u => u.id === currentUser.id) }); setAdminEditingUser(null); showToast('Дані збережені'); };
@@ -1046,6 +1077,10 @@ export default function App() {
   const saveCookieSettings = () => { setCookieConsent(cookieTempSettings); setIsCookieSettingsOpen(false); setIsCookieNoticeOpen(false); showToast('Налаштування cookies збережені'); };
 
   const activeLmFlow = builderForm.moduleConfigs['Лід-магніт']?.flows?.find(f => f.id === activeFlowId) || null;
+
+  // ============================================================================
+  // 📦 МОДУЛЬ 9: ВІЗУАЛЬНА ЧАСТИНА (RENDER HTML / ІНТЕРФЕЙС)
+  // ============================================================================
 
   return (
     <div className="h-screen bg-[#0A0F1D] text-white flex overflow-hidden font-sans selection:bg-cyan-500/30 relative">
