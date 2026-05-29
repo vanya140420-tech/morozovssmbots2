@@ -438,33 +438,7 @@ export default function App() {
       try { await fetch(`https://api.telegram.org/bot${token}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }) }); } catch (e) {}
   };
 
-  // --- BOT ENGINE (Long Polling) ---
-  useEffect(() => {
-    const activeBots = bots.filter(b => b.status === 'Активний');
-    activeBots.forEach(bot => {
-        const startRunner = (token, type) => {
-            if (!token) return;
-            const runnerId = `${bot.id}_${type}`;
-            let runner = runnersRef.current[runnerId];
-            if (!runner || !runner.isRunning) {
-                runner = { isRunning: true, abortController: new AbortController(), lastUpdateId: 0, type };
-                runnersRef.current[runnerId] = runner;
-                fetch(`https://api.telegram.org/bot${token}/deleteWebhook?drop_pending_updates=true`).then(() => pollTelegramUpdates(bot.id, runnerId, token)).catch(()=>{});
-            }
-        };
-        if (bot.tokenFunnel) startRunner(bot.tokenFunnel, 'funnel');
-        if (bot.tokenLm) startRunner(bot.tokenLm, 'lm');
-    });
-    Object.keys(runnersRef.current).forEach(runnerId => {
-      const [botIdStr, type] = runnerId.split('_');
-      const isStillActive = activeBots.some(b => b.id === parseInt(botIdStr) && (type === 'funnel' ? b.tokenFunnel : b.tokenLm));
-      if (!isStillActive && runnersRef.current[runnerId].isRunning) {
-        runnersRef.current[runnerId].isRunning = false;
-        if (runnersRef.current[runnerId].abortController) runnersRef.current[runnerId].abortController.abort();
-      }
-    });
-  }, [bots]);
-
+  // Вимикаємо локальний браузерний Polling, оскільки тепер працюємо через Webhooks на сервері Vercel
   useEffect(() => { return () => { Object.values(runnersRef.current).forEach(r => r.abortController?.abort()); }; }, []);
 
   const pollTelegramUpdates = async (botId, runnerId, token) => {
@@ -1039,7 +1013,31 @@ export default function App() {
   const verifyTelegramToken = async (type) => { const token = type === 'funnel' ? builderForm.tokenFunnel : builderForm.tokenLm; if (!token) return showToast('Введіть токен', 'error'); type === 'funnel' ? setTokenStatusFunnel('loading') : setTokenStatusLm('loading'); try { const res = await fetch(`https://api.telegram.org/bot${token}/getMe`); const data = await res.json(); if (data.ok) { type === 'funnel' ? setTokenStatusFunnel('success') : setTokenStatusLm('success'); setVerifiedBotData(data.result); if (!builderForm.name) setBuilderForm(p => ({ ...p, name: data.result.first_name })); showToast(`Успішно: @${data.result.username}`); } else { type === 'funnel' ? setTokenStatusFunnel('error') : setTokenStatusLm('error'); showToast('Невірний токен', 'error'); } } catch (err) { type === 'funnel' ? setTokenStatusFunnel('error') : setTokenStatusLm('error'); showToast('Помилка API', 'error'); } };
   const saveBot = () => { if (!builderForm.name) return showToast('Введіть ім\'я бота', 'error'); setIsSaving(true); setTimeout(() => { const cleanMenu = builderForm.menu.filter(m => m.command.trim() && m.description.trim()); const botDataToSave = { ...builderForm, menu: cleanMenu, modules: builderForm.modules }; const pushMenu = async (tokenStr) => { if (tokenStr && cleanMenu.length > 0) { await fetch(`https://api.telegram.org/bot${tokenStr}/setMyCommands`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ commands: cleanMenu.map(m => ({command: m.command, description: m.description})) }) }).catch(()=>{}); } else if (tokenStr && cleanMenu.length === 0) { await fetch(`https://api.telegram.org/bot${tokenStr}/deleteMyCommands`).catch(()=>{}); } }; pushMenu(botDataToSave.tokenFunnel); pushMenu(botDataToSave.tokenLm); if (editingBot) { saveStateToDb({ bots: bots.map(b => b.id === editingBot.id ? { ...b, ...botDataToSave, username: verifiedBotData?.username || b.username } : b) }); showToast('Налаштування збережено'); } else { saveStateToDb({ bots: [...bots, { id: Date.now(), userId: currentUser.id, ...botDataToSave, username: verifiedBotData?.username || 'new_bot', status: 'Активний', users: 0, interactions: 0, uniqueUserIds: [] }] }); showToast('Бота створено!'); } setIsSaving(false); setIsBuilderOpen(false); }, 600); };
   const deleteBot = () => { if (editingBot) { saveStateToDb({ bots: bots.filter(b => b.id !== editingBot.id) }); setIsBuilderOpen(false); showToast('Бота видалено', 'error'); } };
-  const toggleBotStatus = (id) => { saveStateToDb({ bots: bots.map(b => { if (b.id === id) { const newStatus = b.status === 'Активний' ? 'Пауза' : 'Активний'; showToast(newStatus === 'Активний' ? 'Бота запущено' : 'Бота зупинено', 'info'); return { ...b, status: newStatus }; } return b; }) }); };
+  
+  const toggleBotStatus = async (id) => { 
+      const bot = bots.find(b => b.id === id);
+      const newStatus = bot.status === 'Активний' ? 'Пауза' : 'Активний'; 
+      
+      // АВТОМАТИЧНЕ ПІДКЛЮЧЕННЯ ДО СЕРВЕРА (Vercel Webhooks)
+      const serverUrl = window.location.origin; // Отримуємо URL сайту (напр. https://bots.vercel.app)
+      
+      try {
+          if (newStatus === 'Активний') {
+              if (bot.tokenFunnel) await fetch(`https://api.telegram.org/bot${bot.tokenFunnel}/setWebhook?url=${serverUrl}/api/webhook?botId=${bot.id}&type=funnel`);
+              if (bot.tokenLm) await fetch(`https://api.telegram.org/bot${bot.tokenLm}/setWebhook?url=${serverUrl}/api/webhook?botId=${bot.id}&type=lm`);
+              showToast('Бота запущено на сервері (24/7) 🚀', 'success');
+          } else {
+              if (bot.tokenFunnel) await fetch(`https://api.telegram.org/bot${bot.tokenFunnel}/deleteWebhook`);
+              if (bot.tokenLm) await fetch(`https://api.telegram.org/bot${bot.tokenLm}/deleteWebhook`);
+              showToast('Бота зупинено', 'info');
+          }
+      } catch (error) {
+          console.error("Webhook Error:", error);
+      }
+      
+      saveStateToDb({ bots: bots.map(b => b.id === id ? { ...b, status: newStatus } : b) }); 
+  };
+
   const getStepPreviewLabel = (step, idx) => { if (!step) return `Блок ${idx + 1}`; if (step.type === 'message') return `[Повідомлення] ${step.text ? step.text.substring(0, 15) + '...' : 'Медіа...'}`; if (step.type === 'wait_input') return `[Очікування] ${step.expectedText || 'тексту'}`; if (step.type === 'check_sub') return `[Підписка]`; if (step.type === 'delay') return `[Таймер]`; return `Блок ${idx + 1}`; };
 
   const handleAcceptAllCookies = () => { setCookieConsent({ analytical: true, marketing: true }); setIsCookieNoticeOpen(false); };
@@ -2412,10 +2410,10 @@ export default function App() {
               )}
               
               <div className="p-4 md:p-6 border-t border-[#1F2937] bg-[#0B1120] flex justify-between items-center shrink-0 rounded-b-3xl">
-                {editingBot && !activeConfigModule ? <button onClick={deleteBot} className="text-red-400 hover:text-red-300 font-medium px-4 py-2 transition-colors border border-red-500/20 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-sm">Видалити бота</button> : <div></div>}
+                {editingBot ? <button onClick={deleteBot} className="text-red-400 hover:text-red-300 font-medium px-4 py-2 transition-colors border border-red-500/20 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-sm">Видалити бота</button> : <div></div>}
                 <div className="flex gap-3">
                   <button onClick={() => setIsBuilderOpen(false)} className="px-6 py-2.5 rounded-xl border border-[#1F2937] text-gray-400 hover:text-white transition-colors text-sm font-medium hover:bg-[#131B2C]">Скасувати</button>
-                  <button onClick={saveBot} disabled={!builderForm.name || isSaving} className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold transition-all transform active:scale-95 shadow-[0_0_15px_rgba(34,211,238,0.3)] flex items-center gap-2 text-sm">{isSaving ? <Loader2 size={16} className="animate-spin" /> : <><Save size={16} /> Зберегти бота</>}</button>
+                  <button onClick={saveBot} disabled={isSaving} className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold transition-all transform active:scale-95 shadow-[0_0_15px_rgba(34,211,238,0.3)] flex items-center gap-2 text-sm">{isSaving ? <Loader2 size={16} className="animate-spin" /> : <><Save size={16} /> Зберегти бота</>}</button>
                 </div>
               </div>
             </div>
@@ -2424,4 +2422,18 @@ export default function App() {
       )}
     </div>
   );
+}
+
+// --- АВТОМАТИЧНИЙ ЗАПУСК ДЛЯ VERCEL ---
+// Цей блок коду дає команду браузеру намалювати інтерфейс на реальному сайті.
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  setTimeout(() => {
+    const rootElement = document.getElementById('root');
+    // Перевіряємо, чи корінь порожній (щоб не малювати двічі)
+    if (rootElement && rootElement.childElementCount === 0) {
+      import('react-dom/client').then(({ createRoot }) => {
+        createRoot(rootElement).render(<App />);
+      }).catch(err => console.error("Помилка рендерингу:", err));
+    }
+  }, 100);
 }
