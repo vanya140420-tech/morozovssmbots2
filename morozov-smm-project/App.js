@@ -1155,120 +1155,123 @@ export default function App() {
 
       {/* --- RENDER GATES --- */}
       {(!currentUser || activeTab === 'landing') && !isAuthPageOpen && (
-        <div className="min-h-screen bg-[#0A0F1D] text-white font-sans selection:bg-cyan-500/30 overflow-x-hidden relative flex flex-col w-full">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/20 blur-[120px] pointer-events-none" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none" />
-          <header className="max-w-7xl w-full mx-auto px-6 py-6 flex justify-between items-center relative z-10 border-b border-[#1F2937]/50">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => currentUser ? setActiveTab('home') : setActiveTab('landing')}>
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.4)]"><Bot size={24} className="text-white" /></div>
-              <span className="font-bold text-2xl tracking-widest">MOROZOV</span>
-            </div>
-            <div className="flex items-center gap-4">
-              {currentUser ? (
-                <button onClick={() => setActiveTab('home')} className="bg-white text-[#0A0F1D] px-6 py-2.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105 transition-transform flex items-center gap-2">В кабінет <ArrowRight size={18} /></button>
-              ) : (
-                <>
-                  <button onClick={() => { setIsLoginMode(true); setIsAuthPageOpen(true); }} className="text-gray-400 hover:text-white font-medium px-2 py-2 transition-colors hidden md:block">Увійти</button>
-                  <button onClick={() => { setIsLoginMode(false); setIsAuthPageOpen(true); }} className="bg-white text-[#0A0F1D] px-6 py-2.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105 transition-transform flex items-center gap-2">Почати <ArrowRight size={18} /></button>
-                </>
-              )}
-            </div>
-          </header>
-          <main className="flex-grow flex flex-col items-center justify-center text-center px-6 pt-24 pb-20 relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-8 animate-in slide-in-from-bottom-4 fade-in duration-700">
-              <Sparkles size={16} /> Нова ера Telegram автоматизації
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight max-w-4xl mx-auto animate-in slide-in-from-bottom-6 fade-in duration-700 delay-100">
-              Візуальний конструктор <br className="hidden md:block"/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Машина Продаж</span>
-            </h1>
-            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200">
-              Платформа для створення ефективних воронок у Telegram без зайвого коду. Розгалуження, таймери, очікування тексту.
-            </p>
-            <div className="flex justify-center items-center animate-in zoom-in-95 fade-in duration-700 delay-300 w-full">
-              <button onClick={() => { if (currentUser) { setActiveTab('home'); } else { setIsLoginMode(false); setIsAuthPageOpen(true); } }} className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(34,211,238,0.3)] hover:scale-105 transition-transform flex items-center justify-center gap-3">
-                {currentUser ? 'Відкрити кабінет' : 'Створити бота'} <Zap size={20} />
-              </button>
-            </div>
-          </main>
+        <div className="bg-[#0A0F1D] text-white font-sans selection:bg-cyan-500/30 overflow-x-hidden relative w-full block">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/20 blur-[120px] pointer-events-none z-0" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none z-0" />
           
-          <AppFooter modals={{ terms: () => toggleModal('terms', true), privacy: () => toggleModal('privacy', true), refund: () => toggleModal('refund', true), offer: () => toggleModal('offer', true), tgapi: () => toggleModal('tgapi', true), cookie: () => toggleModal('cookie', true), contacts: () => toggleModal('contacts', true) }} info={companyInfo} />
+          <div className="min-h-screen flex flex-col relative z-10 w-full">
+            <header className="max-w-7xl w-full mx-auto px-6 py-6 flex justify-between items-center relative z-10 border-b border-[#1F2937]/50 shrink-0">
+              <div className="flex items-center gap-3 cursor-pointer" onClick={() => currentUser ? setActiveTab('home') : setActiveTab('landing')}>
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.4)]"><Bot size={24} className="text-white" /></div>
+                <span className="font-bold text-2xl tracking-widest">MOROZOV</span>
+              </div>
+              <div className="flex items-center gap-4">
+                {currentUser ? (
+                  <button onClick={() => setActiveTab('home')} className="bg-white text-[#0A0F1D] px-6 py-2.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105 transition-transform flex items-center gap-2">В кабінет <ArrowRight size={18} /></button>
+                ) : (
+                  <>
+                    <button onClick={() => { setIsLoginMode(true); setIsAuthPageOpen(true); }} className="text-gray-400 hover:text-white font-medium px-2 py-2 transition-colors hidden md:block">Увійти</button>
+                    <button onClick={() => { setIsLoginMode(false); setIsAuthPageOpen(true); }} className="bg-white text-[#0A0F1D] px-6 py-2.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105 transition-transform flex items-center gap-2">Почати <ArrowRight size={18} /></button>
+                  </>
+                )}
+              </div>
+            </header>
+            <main className="flex-grow flex flex-col items-center justify-center text-center px-6 pt-16 pb-20 relative z-10">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-8 animate-in slide-in-from-bottom-4 fade-in duration-700">
+                <Sparkles size={16} /> Нова ера Telegram автоматизації
+              </div>
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight max-w-4xl mx-auto animate-in slide-in-from-bottom-6 fade-in duration-700 delay-100">
+                Візуальний конструктор <br className="hidden md:block"/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Машина Продаж</span>
+              </h1>
+              <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200">
+                Платформа для створення ефективних воронок у Telegram без зайвого коду. Розгалуження, таймери, очікування тексту.
+              </p>
+              <div className="flex justify-center items-center animate-in zoom-in-95 fade-in duration-700 delay-300 w-full">
+                <button onClick={() => { if (currentUser) { setActiveTab('home'); } else { setIsLoginMode(false); setIsAuthPageOpen(true); } }} className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(34,211,238,0.3)] hover:scale-105 transition-transform flex items-center justify-center gap-3">
+                  {currentUser ? 'Відкрити кабінет' : 'Створити бота'} <Zap size={20} />
+                </button>
+              </div>
+            </main>
+          </div>
+          
+          <div className="w-full relative z-20 bg-[#0A0F1D]">
+            <AppFooter modals={{ terms: () => toggleModal('terms', true), privacy: () => toggleModal('privacy', true), refund: () => toggleModal('refund', true), offer: () => toggleModal('offer', true), tgapi: () => toggleModal('tgapi', true), cookie: () => toggleModal('cookie', true), contacts: () => toggleModal('contacts', true) }} info={companyInfo} />
+          </div>
           {renderModals()}
         </div>
       )}
 
       {!currentUser && isAuthPageOpen && (
-        <div className="min-h-screen w-full bg-[#0A0F1D] flex flex-col relative overflow-hidden text-white font-sans">
-          {/* Background Elements */}
+        <div className="w-full bg-[#0A0F1D] relative overflow-hidden text-white font-sans block">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/20 blur-[120px] pointer-events-none z-0" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none z-0" />
 
-          {/* Top Header / Back Button */}
-          <div className="w-full p-6 relative z-20">
-            <button onClick={() => setIsAuthPageOpen(false)} className="text-gray-400 hover:text-white flex items-center gap-2 transition-colors font-medium bg-[#131B2C]/80 backdrop-blur-xl px-4 py-2.5 rounded-xl border border-[#1F2937] hover:border-cyan-500/30 w-max shadow-sm">
-              <ArrowLeft size={18} /> На головну сторінку
-            </button>
-          </div>
+          <div className="min-h-screen flex flex-col relative z-10 w-full">
+            <div className="w-full p-6 shrink-0 relative z-20">
+              <button onClick={() => setIsAuthPageOpen(false)} className="text-gray-400 hover:text-white flex items-center gap-2 transition-colors font-medium bg-[#131B2C]/80 backdrop-blur-xl px-4 py-2.5 rounded-xl border border-[#1F2937] hover:border-cyan-500/30 w-max shadow-sm">
+                <ArrowLeft size={18} /> На головну сторінку
+              </button>
+            </div>
 
-          {/* Main Auth Form Container */}
-          <div className="flex-grow flex items-center justify-center p-4 relative z-10 w-full">
-            <div className="w-full max-w-md bg-[#131B2C]/80 backdrop-blur-2xl rounded-[2.5rem] p-8 md:p-10 border border-[#1F2937] shadow-[0_0_50px_rgba(34,211,238,0.05)] animate-in zoom-in-95 duration-500 my-4">
-              
-              <div className="flex flex-col items-center mb-8 cursor-pointer group" onClick={() => setIsAuthPageOpen(false)} title="На головну">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(34,211,238,0.4)] group-hover:scale-105 transition-transform">
-                  <Bot size={32} className="text-white" />
+            <div className="flex-grow flex items-center justify-center p-4 relative z-10 w-full pb-10">
+              <div className="w-full max-w-md bg-[#131B2C]/80 backdrop-blur-2xl rounded-[2.5rem] p-8 md:p-10 border border-[#1F2937] shadow-[0_0_50px_rgba(34,211,238,0.05)] animate-in zoom-in-95 duration-500 my-4">
+                
+                <div className="flex flex-col items-center mb-8 cursor-pointer group" onClick={() => setIsAuthPageOpen(false)} title="На головну">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(34,211,238,0.4)] group-hover:scale-105 transition-transform">
+                    <Bot size={32} className="text-white" />
+                  </div>
+                  <h1 className="text-2xl font-bold tracking-widest text-white">MOROZOV<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">-SMM</span></h1>
                 </div>
-                <h1 className="text-2xl font-bold tracking-widest text-white">MOROZOV<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">-SMM</span></h1>
-              </div>
 
-              <div className="flex bg-[#0B1120] rounded-xl p-1.5 mb-8 border border-[#1F2937]">
-                  <button type="button" onClick={() => {setIsLoginMode(true); setAuthError('');}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${isLoginMode ? 'bg-[#131B2C] text-cyan-400 shadow-md border border-[#1F2937]' : 'text-gray-500 hover:text-gray-300 border border-transparent'}`}>Увійти</button>
-                  <button type="button" onClick={() => {setIsLoginMode(false); setAuthError('');}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${!isLoginMode ? 'bg-[#131B2C] text-cyan-400 shadow-md border border-[#1F2937]' : 'text-gray-500 hover:text-gray-300 border border-transparent'}`}>Реєстрація</button>
-              </div>
+                <div className="flex bg-[#0B1120] rounded-xl p-1.5 mb-8 border border-[#1F2937]">
+                    <button type="button" onClick={() => {setIsLoginMode(true); setAuthError('');}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${isLoginMode ? 'bg-[#131B2C] text-cyan-400 shadow-md border border-[#1F2937]' : 'text-gray-500 hover:text-gray-300 border border-transparent'}`}>Увійти</button>
+                    <button type="button" onClick={() => {setIsLoginMode(false); setAuthError('');}} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${!isLoginMode ? 'bg-[#131B2C] text-cyan-400 shadow-md border border-[#1F2937]' : 'text-gray-500 hover:text-gray-300 border border-transparent'}`}>Реєстрація</button>
+                </div>
 
-              <form onSubmit={handleAuth} className="space-y-4">
-                {!isLoginMode && (
+                <form onSubmit={handleAuth} className="space-y-4">
+                  {!isLoginMode && (
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><User size={18} className="text-gray-500" /></div>
+                      <input required type="text" value={authForm.name} onChange={e => setAuthForm({...authForm, name: e.target.value})} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl pl-11 pr-4 py-3.5 text-white focus:border-cyan-500 transition-all outline-none text-sm" placeholder="Ваше ім'я (напр. Іван)" />
+                    </div>
+                  )}
+                  
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><User size={18} className="text-gray-500" /></div>
-                    <input required type="text" value={authForm.name} onChange={e => setAuthForm({...authForm, name: e.target.value})} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl pl-11 pr-4 py-3.5 text-white focus:border-cyan-500 transition-all outline-none text-sm" placeholder="Ваше ім'я (напр. Іван)" />
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Mail size={18} className="text-gray-500" /></div>
+                    <input required type="email" value={authForm.email} onChange={e => setAuthForm({...authForm, email: e.target.value})} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl pl-11 pr-4 py-3.5 text-white focus:border-cyan-500 transition-all outline-none text-sm" placeholder="Електронна пошта" />
                   </div>
-                )}
-                
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Mail size={18} className="text-gray-500" /></div>
-                  <input required type="email" value={authForm.email} onChange={e => setAuthForm({...authForm, email: e.target.value})} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl pl-11 pr-4 py-3.5 text-white focus:border-cyan-500 transition-all outline-none text-sm" placeholder="Електронна пошта" />
-                </div>
-                
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Lock size={18} className="text-gray-500" /></div>
-                  <input required type="password" value={authForm.password} onChange={e => setAuthForm({...authForm, password: e.target.value})} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl pl-11 pr-4 py-3.5 text-white focus:border-cyan-500 transition-all outline-none text-sm" placeholder="Пароль" />
-                </div>
-                
-                {!isLoginMode && (
-                  <div className="flex items-start gap-3 mt-5 bg-[#0B1120]/50 p-3.5 rounded-xl border border-[#1F2937]">
-                    <input type="checkbox" id="terms" checked={authForm.agreed} onChange={e => setAuthForm({...authForm, agreed: e.target.checked})} className="mt-0.5 w-4 h-4 accent-cyan-500 flex-shrink-0 cursor-pointer rounded" />
-                    <label htmlFor="terms" className="text-[11px] text-gray-400 leading-relaxed cursor-pointer select-none">
-                      Я погоджуюсь з умовами{' '}
-                      <span onClick={(e)=>{e.preventDefault(); e.stopPropagation(); toggleModal('terms', true);}} className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Угоди користувача</span>,{' '}
-                      <span onClick={(e)=>{e.preventDefault(); e.stopPropagation(); toggleModal('privacy', true);}} className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Конфіденційності</span> та{' '}
-                      <span onClick={(e)=>{e.preventDefault(); e.stopPropagation(); toggleModal('tgapi', true);}} className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Telegram API Policy</span>
-                    </label>
+                  
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Lock size={18} className="text-gray-500" /></div>
+                    <input required type="password" value={authForm.password} onChange={e => setAuthForm({...authForm, password: e.target.value})} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl pl-11 pr-4 py-3.5 text-white focus:border-cyan-500 transition-all outline-none text-sm" placeholder="Пароль" />
                   </div>
-                )}
+                  
+                  {!isLoginMode && (
+                    <div className="flex items-start gap-3 mt-5 bg-[#0B1120]/50 p-3.5 rounded-xl border border-[#1F2937]">
+                      <input type="checkbox" id="terms" checked={authForm.agreed} onChange={e => setAuthForm({...authForm, agreed: e.target.checked})} className="mt-0.5 w-4 h-4 accent-cyan-500 flex-shrink-0 cursor-pointer rounded" />
+                      <label htmlFor="terms" className="text-[11px] text-gray-400 leading-relaxed cursor-pointer select-none">
+                        Я погоджуюсь з умовами{' '}
+                        <span onClick={(e)=>{e.preventDefault(); e.stopPropagation(); toggleModal('terms', true);}} className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Угоди користувача</span>,{' '}
+                        <span onClick={(e)=>{e.preventDefault(); e.stopPropagation(); toggleModal('privacy', true);}} className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Конфіденційності</span> та{' '}
+                        <span onClick={(e)=>{e.preventDefault(); e.stopPropagation(); toggleModal('tgapi', true);}} className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Telegram API Policy</span>
+                      </label>
+                    </div>
+                  )}
 
-                {authError && <div className="text-red-400 text-sm bg-red-500/10 p-3.5 rounded-xl border border-red-500/20 flex items-center gap-2.5 mt-2 shadow-sm"><ShieldAlert size={18} className="shrink-0"/> {authError}</div>}
+                  {authError && <div className="text-red-400 text-sm bg-red-500/10 p-3.5 rounded-xl border border-red-500/20 flex items-center gap-2.5 mt-2 shadow-sm"><ShieldAlert size={18} className="shrink-0"/> {authError}</div>}
+                  
+                  <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] transition-all transform active:scale-[0.98] mt-4 text-[15px]">{isLoginMode ? 'Увійти до кабінету' : 'Створити акаунт'}</button>
+                </form>
                 
-                <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] transition-all transform active:scale-[0.98] mt-4 text-[15px]">{isLoginMode ? 'Увійти до кабінету' : 'Створити акаунт'}</button>
-              </form>
-              
-              <div className="mt-8 text-center bg-[#0B1120]/50 p-4 rounded-xl border border-[#1F2937]">
-                <button onClick={() => {setIsLoginMode(!isLoginMode); setAuthError('');}} className="text-gray-400 hover:text-white text-sm font-medium transition-colors w-full">{isLoginMode ? 'Ще не з нами? ' : 'Вже є акаунт? '}<span className="text-cyan-400 underline underline-offset-4 decoration-cyan-400/50 hover:decoration-cyan-400">{isLoginMode ? 'Створити зараз' : 'Увійти'}</span></button>
+                <div className="mt-8 text-center bg-[#0B1120]/50 p-4 rounded-xl border border-[#1F2937]">
+                  <button onClick={() => {setIsLoginMode(!isLoginMode); setAuthError('');}} className="text-gray-400 hover:text-white text-sm font-medium transition-colors w-full">{isLoginMode ? 'Ще не з нами? ' : 'Вже є акаунт? '}<span className="text-cyan-400 underline underline-offset-4 decoration-cyan-400/50 hover:decoration-cyan-400">{isLoginMode ? 'Створити зараз' : 'Увійти'}</span></button>
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Footer that stays at the bottom */}
-          <div className="w-full mt-auto z-20 relative">
+          <div className="w-full relative z-20 bg-[#0A0F1D]">
             <AppFooter modals={{ terms: () => toggleModal('terms', true), privacy: () => toggleModal('privacy', true), refund: () => toggleModal('refund', true), offer: () => toggleModal('offer', true), tgapi: () => toggleModal('tgapi', true), cookie: () => toggleModal('cookie', true), contacts: () => toggleModal('contacts', true) }} info={companyInfo} />
           </div>
 
