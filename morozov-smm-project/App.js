@@ -62,48 +62,6 @@ const DEFAULT_PLANS = {
 const DEFAULT_COMPANY_INFO = { fop: '', edrpou: '', address: '', email: '', tgSupport: '' };
 
 const MOCK_USERS = [
-  { id: 'ID0', name: 'Іван (Адмін)', email: 'vanaslinavskij@gmail.com', password: 'admin', role: 'founder', status: '👑 Founder', plan: 'Unlimited', autoRenew: true, refundRequested: false },
-  { id: 'ID1', name: 'Стас (Founder)', email: 'stasznam44@gmail.com', password: 'admin', role: 'founder', status: '👑 Founder', plan: 'Unlimited', autoRenew: true, refundRequested: false }
-];
-
-const MOCK_BOTS = [
-  { id: 1, userId: 'ID0', name: 'Smart Flow Bot', username: 'smart_lead_bot', tokenFunnel: '', tokenLm: '1234:ABC', status: 'Пауза', modules: ['Лід-магніт'], moduleConfigs: DEFAULT_MODULE_CONFIGS, menu: [{command: 'start', description: 'Головне меню', message: 'Оберіть потрібний розділ', mediaType: 'none', mediaUrl: '', links: []}], users: 1250, uniqueUserIds: [], interactions: 5430, currentMonth: new Date().toISOString().slice(0, 7) },
-];
-
-const ANALYTICS_DATA_WEEK = [
-  { name: 'Пн', users: 40, interactions: 240 }, { name: 'Вт', users: 30, interactions: 139 },
-  { name: 'Ср', users: 60, interactions: 580 }, { name: 'Чт', users: 27, interactions: 390 },
-  { name: 'Пт', users: 78, interactions: 880 }, { name: 'Сб', users: 23, interactions: 380 },
-  { name: 'Нд', users: 94, interactions: 1130 },
-];
-
-// ============================================================================
-// 📦 МОДУЛЬ 2: СПІЛЬНІ КОМПОНЕНТИ (FOOTER, MODALS, ЮРИДИЧНІ ДОКУМЕНТИ)
-// ============================================================================
-
-// --- ПЕРЕИСПОЛЬЗУЕМЫЕ КОМПОНЕНТЫ ---
-const DEFAULT_MODULE_CONFIGS = {
-  'Лід-магніт': { 
-    flows: [{ id: 'flow_1', trigger: 'аудит', name: 'Воронка Аудит', isActive: true, steps: [
-      { id: 'step_1', type: 'message', text: 'Привіт! Хочеш отримати відео-аудит?', delayDays: 0, delayHours: 0, delayMinutes: 0, delaySeconds: 0, mediaType: 'none', mediaUrl: '', buttons: [{ id: 1, title: 'Так, хочу', actionType: 'step', url: '', nextStepId: 'step_2' }, { id: 2, title: 'Ні, дякую', actionType: 'step', url: '', nextStepId: 'step_3' }] },
-      { id: 'step_2', type: 'message', text: 'Чудово! Ось PDF-інструкция. Як прочитаєш, напиши мені слово "переглянув".', delayDays: 0, delayHours: 0, delayMinutes: 0, delaySeconds: 0, mediaType: 'document', mediaUrl: 'https://example.com/file.pdf', buttons: [] },
-      { id: 'step_3', type: 'message', text: 'Добре, якщо передумаєш — пиши "аудит".', delayDays: 0, delayHours: 0, delayMinutes: 0, delaySeconds: 0, mediaType: 'none', mediaUrl: '', buttons: [] },
-      { id: 'step_wait_1', type: 'wait_input', expectedText: 'переглянув', fallbackText: 'Напиши слово "переглянув", щоб отримати відео.', successText: 'Молодець! Тримай бонусне відео.', successMediaType: 'video', successMediaUrl: 'https://example.com/video.mp4' },
-      { id: 'step_4', type: 'message', text: 'Як тобі відео? Запишись на дзвінок!', delayDays: 0, delayHours: 0, delayMinutes: 1, delaySeconds: 0, mediaType: 'none', mediaUrl: '', buttons: [{ id: 1, title: 'Мій канал', actionType: 'url', url: 'https://t.me/durov', nextStepId: '' }] }
-    ]}]
-  },
-  'Автоворонка': { trigger: '/start', requireSub: false, channelUrl: '', channelId: '', subCheckText: 'Підпишіться на наш Telegram канал, щоб продовжити:', subErrorText: 'Ви не підписались! Перевірте підписку.', steps: [{ id: 1, delay: '0', delayUnit: 'minutes', goal: 'entry', text: 'Привіт! Ласкаво просимо.', keyword: '', mediaType: 'none', mediaUrl: '', links: [] }] }
-};
-
-const DEFAULT_PLANS = {
-  Starter: { price: 999, maxBots: 1, maxUsers: '1000', maxFlows: 1, maxModules: 5, allowedModules: ['Автоворонка'], paymentUrl: '', description: 'Ідеально для старту та одного невеликого проєкту.', features: [{ text: '1 Активний бот', included: true }, { text: 'До 1,000 юзерів', included: true }, { text: 'Базова автоворонка', included: true }, { text: 'Багатокрокові ланцюжки', included: false }] },
-  Pro: { price: 3499, maxBots: 5, maxUsers: '10000', maxFlows: 5, maxModules: 20, allowedModules: ['Лід-магніт', 'Автоворонка'], paymentUrl: '', description: 'Для експертів та малого бізнесу.\nПотужні розгалужені воронки.', features: [{ text: 'До 5 ботів', included: true }, { text: 'До 10,000 юзерів', included: true }, { text: 'Розумний Лід-магніт (Flow)', included: true }, { text: 'До 20 модулів у воронці', included: true }] },
-  Agency: { price: 9999, maxBots: 'Безлімит', maxUsers: 'Безлімит', maxFlows: 20, maxModules: 50, allowedModules: ['Лід-магніт', 'Автоворонка'], paymentUrl: '', description: 'Для агенцій.\nСтворюйте ботів для своїх клієнтів без обмежень.', features: [{ text: 'Безліміт ботів', included: true }, { text: 'До 50 модулів у воронці', included: true }, { text: 'Пріоритетна підтримка', included: true }, { text: 'White-label', included: true }] }
-};
-
-const DEFAULT_COMPANY_INFO = { fop: '', edrpou: '', address: '', email: '', tgSupport: '' };
-
-const MOCK_USERS = [
   { id: 'ID0', name: 'Іван (Founder)', email: 'vanaslinavskij@gmail.com', password: 'admin', role: 'founder', status: '👑 Founder', plan: 'Unlimited', autoRenew: true, refundRequested: false },
   { id: 'ID1', name: 'Стас (Founder)', email: 'stasznam44@gmail.com', password: 'admin', role: 'founder', status: '👑 Founder', plan: 'Unlimited', autoRenew: true, refundRequested: false },
   { id: 'ID2', name: 'Модератор (Адмін)', email: 'admin@morozov.com', password: 'admin', role: 'admin', status: '🛡️ Адмін', plan: 'Agency', autoRenew: true, refundRequested: false },
@@ -122,7 +80,7 @@ const ANALYTICS_DATA_WEEK = [
 ];
 
 // ============================================================================
-// 📦 MODULE 3: SHARED UI COMPONENTS (Footer, Modals, etc.)
+// 📦 MODULE 2: SHARED UI COMPONENTS (Footer, Modals, etc.)
 // ============================================================================
 const AppFooter = ({ modals, info }) => (
   <footer className="w-full bg-[#0A0F1D] border-t border-[#1F2937] mt-auto z-10 shrink-0">
@@ -286,7 +244,7 @@ const TgApiContent = ({ info }) => (
     </LegalSection>
     <LegalSection title="2. Дотримання правил Telegram">
       <p>2.1. Користувач несе одноосібну юридичну відповідальність за контент, що розсилається його ботами, та взаємодію з підписниками.</p>
-      <p>2.2. Користувач зобов'язується суворо дотримуватись <a href="https://core.telegram.org/bots/faq" target="_blank" className="text-cyan-400 hover:underline">Правил використання Telegram API</a>.</p>
+      <p>2.2. Користувач зобов'язується суворо дотримуватись <a href="https://core.telegram.org/bots/faq" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">Правил використання Telegram API</a>.</p>
     </LegalSection>
     <LegalSection title="3. Категоричні заборони (Anti-Spam)">
       <ul className="list-disc pl-5 space-y-2 mt-2 bg-red-500/10 text-red-300 p-4 rounded-xl border border-red-500/20">
@@ -338,7 +296,7 @@ const ContactsContent = ({ info }) => (
         </div>
         <div className="flex items-center gap-4">
            <div className="w-10 h-10 rounded-full bg-telegram/10 flex items-center justify-center text-[#0088cc]"><Send size={18}/></div>
-           <div><p className="text-xs text-gray-500 uppercase font-bold">Telegram Support</p><a href={`https://t.me/${(info?.tgSupport || '').replace('@', '')}`} target="_blank" className="text-cyan-400 hover:underline">{info?.tgSupport || '@support_bot'}</a></div>
+           <div><p className="text-xs text-gray-500 uppercase font-bold">Telegram Support</p><a href={`https://t.me/${(info?.tgSupport || '').replace('@', '')}`} target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">{info?.tgSupport || '@support_bot'}</a></div>
         </div>
       </div>
     </LegalSection>
@@ -346,115 +304,26 @@ const ContactsContent = ({ info }) => (
 );
 
 // ============================================================================
-// 📦 MODULE 4: MAIN APP COMPONENT & STATE DECLARATIONS
+// 📦 MODULE 3: MAIN APP COMPONENT & STATE DECLARATIONS
 // ============================================================================
+
 export default function App() {
   const [fbReady, setFbReady] = useState(false);
   
-  // ВЕРСИЯ БАЗЫ v56 ДЛЯ СБРОСА КЕША И ОТОБРАЖЕНИЯ АДМИНОВ
-  const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem('morozov_users_v56')) || MOCK_USERS);
-  const [bots, setBots] = useState(() => JSON.parse(localStorage.getItem('morozov_bots_v56')) || MOCK_BOTS);
-  const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('morozov_currentUser_v56')) || null);
-  const [plansConfig, setPlansConfig] = useState(() => JSON.parse(localStorage.getItem('morozov_plans_v56')) || DEFAULT_PLANS);
-  const [companyInfo, setCompanyInfo] = useState(() => JSON.parse(localStorage.getItem('morozov_company_info_v56')) || DEFAULT_COMPANY_INFO);
+  // ВЕРСИЯ БАЗЫ v57 ДЛЯ СБРОСА КЕША И ОТОБРАЖЕНИЯ АДМИНОВ
+  const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem('morozov_users_v57')) || MOCK_USERS);
+  const [bots, setBots] = useState(() => JSON.parse(localStorage.getItem('morozov_bots_v57')) || MOCK_BOTS);
+  const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('morozov_currentUser_v57')) || null);
+  const [plansConfig, setPlansConfig] = useState(() => JSON.parse(localStorage.getItem('morozov_plans_v57')) || DEFAULT_PLANS);
+  const [companyInfo, setCompanyInfo] = useState(() => JSON.parse(localStorage.getItem('morozov_company_info_v57')) || DEFAULT_COMPANY_INFO);
   
   // COOKIES STATE
-  const [cookieConsent, setCookieConsent] = useState(() => JSON.parse(localStorage.getItem('morozov_cookie_consent_v56')) || null);
+  const [cookieConsent, setCookieConsent] = useState(() => JSON.parse(localStorage.getItem('morozov_cookie_consent_v57')) || null);
   const [isCookieNoticeOpen, setIsCookieNoticeOpen] = useState(cookieConsent === null); 
   const [isCookieSettingsOpen, setIsCookieSettingsOpen] = useState(false);
   const [cookieTempSettings, setCookieTempSettings] = useState({ analytical: true, marketing: false });
 
   const [activeTab, setActiveTab] = useState('landing');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [toastMessage, setToastMessage] = useState(null); 
-  
-  // Modals state
-  const [modalsOpen, setModalsOpen] = useState({ terms: false, privacy: false, refund: false, offer: false, tgapi: false, cookie: false, contacts: false });
-
-  const [isAuthPageOpen, setIsAuthPageOpen] = useState(false);
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '', agreed: false });
-  const [authError, setAuthError] = useState('');
-  const [settingsForm, setSettingsForm] = useState({ name: '', password: '' });
-  const [analyticsSelectedBot, setAnalyticsSelectedBot] = useState('all');
-
-  // Admin & Builder State
-  const [adminSubTab, setAdminSubTab] = useState('users');
-  const [adminEditingUser, setAdminEditingUser] = useState(null);
-  const [adminBotSearch, setAdminBotSearch] = useState('');
-  const [adminUserSearch, setAdminUserSearch] = useState('');
-  
-  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
-  const [editingBot, setEditingBot] = useState(null);
-  const [builderTab, setBuilderTab] = useState('basic');
-  const [builderForm, setBuilderForm] = useState({ name: '', tokenFunnel: '', tokenLm: '', modules: [], moduleConfigs: JSON.parse(JSON.stringify(DEFAULT_MODULE_CONFIGS)), menu: [] });
-  const [activeConfigModule, setActiveConfigModule] = useState(null); 
-  const [activeFlowId, setActiveFlowId] = useState(null); 
-  const [tokenStatusFunnel, setTokenStatusFunnel] = useState('idle'); 
-  const [tokenStatusLm, setTokenStatusLm] = useState('idle'); 
-  const [verifiedBotData, setVerifiedBotData] = useState(null); 
-  const [isSaving, setIsSaving] = useState(false);
-  
-  const [checkoutPlan, setCheckoutPlan] = useState(null);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [checkoutAgreed, setCheckoutAgreed] = useState(false);
-  
-  const [previewInput, setPreviewInput] = useState('');
-  const [previewChat, setPreviewChat] = useState([]);
-  const chatEndRef = useRef(null);
-
-  const runnersRef = useRef({});
-  const botsRef = useRef(bots);
-  const userSessionsRef = useRef({}); 
-
-  const toggleModal = (modalName, state) => setModalsOpen(prev => ({ ...prev, [modalName]: state }));
-
-  const renderModals = () => (
-    <>
-      <LegalModal title="Користувацька угода" icon={FileText} isOpen={modalsOpen.terms} onClose={() => toggleModal('terms', false)}><TermsContent info={companyInfo} /></LegalModal>
-      <LegalModal title="Політика конфіденційності" icon={ShieldCheck} isOpen={modalsOpen.privacy} onClose={() => toggleModal('privacy', false)}><PrivacyContent info={companyInfo} /></LegalModal>
-      <LegalModal title="Політика повернення коштів" icon={CardIcon} isOpen={modalsOpen.refund} onClose={() => toggleModal('refund', false)}><RefundContent info={companyInfo} /></LegalModal>
-      <LegalModal title="Публічна оферта" icon={BookOpen} isOpen={modalsOpen.offer} onClose={() => toggleModal('offer', false)}><OfferContent info={companyInfo} /></LegalModal>
-      <LegalModal title="Політика використання Telegram API" icon={Bot} isOpen={modalsOpen.tgapi} onClose={() => toggleModal('tgapi', false)}><TgApiContent info={companyInfo} /></LegalModal>
-      <LegalModal title="Cookie Policy" icon={Settings} isOpen={modalsOpen.cookie} onClose={() => toggleModal('cookie', false)}><CookiePolicyContent /></LegalModal>
-      <LegalModal title="Контакти" icon={Phone} isOpen={modalsOpen.contacts} onClose={() => toggleModal('contacts', false)}><ContactsContent info={companyInfo} /></LegalModal>
-    </>
-  );
-
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-[#05080f] text-white">
-       {renderModals()}
-       <div className="text-center p-8 border border-gray-800 rounded-2xl bg-[#0a0f1d]">
-           <h1 className="text-2xl font-bold mb-4 text-cyan-400">Система оновлюється</h1>
-           <p className="text-gray-400">Помилку компіляції виправлено, але частина інтерфейсу була втрачена під час попередньої заміни.</p>
-           <p className="text-gray-300 mt-4 font-medium">Будь ласка, напишіть мені: <b>«Выдай весь файл целиком»</b></p>
-       </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// 📦 МОДУЛЬ 3: ГОЛОВНИЙ КОМПОНЕНТ ДОДАТКУ ТА СТЕЙТИ
-// ============================================================================
-
-// --- MAIN APP COMPONENT ---
-export default function App() {
-  const [fbReady, setFbReady] = useState(false);
-  
-  const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem('morozov_users_v53')) || MOCK_USERS);
-  const [bots, setBots] = useState(() => JSON.parse(localStorage.getItem('morozov_bots_v53')) || MOCK_BOTS);
-  const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('morozov_currentUser_v53')) || null);
-  const [plansConfig, setPlansConfig] = useState(() => JSON.parse(localStorage.getItem('morozov_plans_v53')) || DEFAULT_PLANS);
-  const [companyInfo, setCompanyInfo] = useState(() => JSON.parse(localStorage.getItem('morozov_company_info_v53')) || DEFAULT_COMPANY_INFO);
-  
-  // COOKIES STATE
-  const [cookieConsent, setCookieConsent] = useState(() => JSON.parse(localStorage.getItem('morozov_cookie_consent_v53')) || null);
-  const [isCookieNoticeOpen, setIsCookieNoticeOpen] = useState(cookieConsent === null); 
-  const [isCookieSettingsOpen, setIsCookieSettingsOpen] = useState(false);
-  const [cookieTempSettings, setCookieTempSettings] = useState({ analytical: true, marketing: false });
-
-  const [activeTab, setActiveTab] = useState('home');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [toastMessage, setToastMessage] = useState(null); 
@@ -542,11 +411,11 @@ export default function App() {
   }, [fbReady]);
 
   const saveStateToDb = (newState) => {
-      if (newState.users) { setUsers(newState.users); localStorage.setItem('morozov_users_v53', JSON.stringify(newState.users)); }
-      if (newState.bots) { setBots(newState.bots); localStorage.setItem('morozov_bots_v53', JSON.stringify(newState.bots)); }
-      if (newState.plansConfig) { setPlansConfig(newState.plansConfig); localStorage.setItem('morozov_plans_v53', JSON.stringify(newState.plansConfig)); }
-      if (newState.companyInfo) { setCompanyInfo(newState.companyInfo); localStorage.setItem('morozov_company_info_v53', JSON.stringify(newState.companyInfo)); }
-      if (newState.currentUser !== undefined) { setCurrentUser(newState.currentUser); localStorage.setItem('morozov_currentUser_v53', JSON.stringify(newState.currentUser)); }
+      if (newState.users) { setUsers(newState.users); localStorage.setItem('morozov_users_v57', JSON.stringify(newState.users)); }
+      if (newState.bots) { setBots(newState.bots); localStorage.setItem('morozov_bots_v57', JSON.stringify(newState.bots)); }
+      if (newState.plansConfig) { setPlansConfig(newState.plansConfig); localStorage.setItem('morozov_plans_v57', JSON.stringify(newState.plansConfig)); }
+      if (newState.companyInfo) { setCompanyInfo(newState.companyInfo); localStorage.setItem('morozov_company_info_v57', JSON.stringify(newState.companyInfo)); }
+      if (newState.currentUser !== undefined) { setCurrentUser(newState.currentUser); localStorage.setItem('morozov_currentUser_v57', JSON.stringify(newState.currentUser)); }
       
       if (fbReady && db) {
           const pushData = {};
@@ -567,7 +436,7 @@ export default function App() {
       }
   }, [activeConfigModule, builderForm, activeFlowId]);
 
-  useEffect(() => { localStorage.setItem('morozov_cookie_consent_v53', JSON.stringify(cookieConsent)); }, [cookieConsent]);
+  useEffect(() => { localStorage.setItem('morozov_cookie_consent_v57', JSON.stringify(cookieConsent)); }, [cookieConsent]);
 
   const getPlanLimitForUser = (user, limitField) => {
     if (!user) return 0;
@@ -589,7 +458,6 @@ export default function App() {
   // 📦 МОДУЛЬ 5: ДВИЖОК TELEGRAM БОТІВ
   // ============================================================================
 
-  // Вимикаємо локальний браузерний Polling, оскільки тепер працюємо через Webhooks на сервері Vercel
   useEffect(() => { return () => { Object.values(runnersRef.current).forEach(r => r.abortController?.abort()); }; }, []);
 
   const pollTelegramUpdates = async (botId, runnerId, token) => {
@@ -1001,7 +869,6 @@ export default function App() {
     );
   };
 
-  // РЕАЛЬНА FIREBASE АВТОРИЗАЦІЯ
   const handleAuth = async (e) => {
     e.preventDefault(); 
     setAuthError(''); 
@@ -1011,10 +878,8 @@ export default function App() {
 
     try {
         if (isLoginMode) {
-            // Реальний логін через Firebase
             const userCredential = await signInWithEmailAndPassword(auth, emailLower, authForm.password);
             
-            // Шукаємо юзера в нашій базі (Firestore/Local)
             let user = users.find(u => u.email === emailLower);
             if (!user) {
                 const isFounder = ['vanaslinavskij@gmail.com', 'stasznam44@gmail.com'].includes(emailLower);
@@ -1026,15 +891,14 @@ export default function App() {
             showToast('Успішний вхід'); 
             setIsAuthPageOpen(false);
         } else {
-            // Реальна реєстрація через Firebase
             const userCredential = await createUserWithEmailAndPassword(auth, emailLower, authForm.password);
             const isFounder = ['vanaslinavskij@gmail.com', 'stasznam44@gmail.com'].includes(emailLower);
             
             const newUser = { 
-                id: userCredential.user.uid, // Використовуємо реальний Firebase UID
+                id: userCredential.user.uid,
                 name: authForm.name, 
                 email: emailLower, 
-                password: authForm.password, // У продакшені пароль в базі не зберігається, але лишаємо для сумісності з вашою адмінкою
+                password: authForm.password,
                 role: isFounder ? 'founder' : 'user', 
                 status: isFounder ? '👑 Founder' : '🟢 Starter', 
                 plan: isFounder ? 'Unlimited' : 'Starter', 
@@ -1061,9 +925,9 @@ export default function App() {
   const handleNavClick = (tab) => { setActiveTab(tab); setIsSidebarOpen(false); setIsAuthPageOpen(false); setIsBuilderOpen(false); if (window.innerWidth >= 768) setIsSidebarCollapsed(true); };
   
   const handleLogout = async () => { 
-      try { await signOut(auth); } catch(e) {} // Реальний вихід з Firebase
+      try { await signOut(auth); } catch(e) {} 
       saveStateToDb({ currentUser: null }); 
-      setActiveTab('home'); 
+      setActiveTab('landing'); 
   };
   
   const saveSettings = (e) => { 
@@ -1075,12 +939,6 @@ export default function App() {
   };
   
   const handleWayForPayCheckout = () => { 
-      // АРХІТЕКТУРА РЕАЛЬНОЇ ОПЛАТИ:
-      // Тут має бути виклик WayForPay Widget або редірект на paymentUrl.
-      // Після оплати WayForPay надсилає Webhook на ваш бекенд (наприклад у папку /api/payment), 
-      // який підтверджує транзакцію та оновлює статус користувача в базі даних.
-      // Оскільки серверної частини для оплат зараз немає, залишаємо симуляцію для демонстрації:
-      
       const url = plansConfig[checkoutPlan]?.paymentUrl;
       if (url) window.open(url, '_blank');
       
@@ -1202,6 +1060,13 @@ export default function App() {
   const deleteLmButton = (stepId, btnId) => { const flows = [...builderForm.moduleConfigs['Лід-магніт'].flows]; const step = flows.find(f => f.id === activeFlowId).steps.find(s => s.id === stepId); step.buttons = step.buttons.filter(b => b.id !== btnId); updateModuleConfig('Лід-магніт', 'flows', flows); };
   const handleFileUpload = (stepId, isSuccessMedia = false) => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*,video/*,application/pdf'; input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const url = URL.createObjectURL(file); let mediaType = 'document'; if (file.type.startsWith('image/')) mediaType = 'photo'; if (file.type.startsWith('video/')) mediaType = 'video'; const flows = [...builderForm.moduleConfigs['Лід-магніт'].flows]; const step = flows.find(f => f.id === activeFlowId).steps.find(s => s.id === stepId); step[isSuccessMedia ? 'successMediaType' : 'mediaType'] = mediaType; step[isSuccessMedia ? 'successMediaUrl' : 'mediaUrl'] = url; updateModuleConfig('Лід-магніт', 'flows', flows); showToast('Файл прикріплено', 'info'); }; input.click(); };
   
+  const updateStarterFunnel = (field, _idx, value) => {
+    const steps = [...(builderForm.moduleConfigs['Автоворонка']?.steps || [])];
+    if(steps.length === 0) steps.push({ id: 1, delay: '0', delayUnit: 'minutes', goal: 'entry', text: '', links: [] });
+    steps[0][field] = value;
+    updateModuleConfig('Автоворонка', 'steps', steps);
+  };
+  
   const updateStarterFunnelLinks = (action, idx, field, value) => {
       const steps = [...(builderForm.moduleConfigs['Автоворонка']?.steps || [])];
       if(steps.length === 0) steps.push({ id: 1, delay: '0', delayUnit: 'minutes', goal: 'entry', text: '', links: [] });
@@ -1234,6 +1099,8 @@ export default function App() {
   const loadSmmMenuPreset = () => setBuilderForm(p => ({ ...p, menu: [{ command: 'start', description: 'Головне меню', message: 'Привіт! Я бот-асистент.', mediaType: 'none', mediaUrl: '', links: [] }, { command: 'services', description: 'Послуги', message: 'Ось перелік наших послуг:\n1. SMM', mediaType: 'none', mediaUrl: '', links: [] }, { command: 'contact', description: 'Зв\'язатися', message: 'Напишіть нашому менеджеру', mediaType: 'none', mediaUrl: '', links: [] }]}));
   const verifyTelegramToken = async (type) => { const token = type === 'funnel' ? builderForm.tokenFunnel : builderForm.tokenLm; if (!token) return showToast('Введіть токен', 'error'); type === 'funnel' ? setTokenStatusFunnel('loading') : setTokenStatusLm('loading'); try { const res = await fetch(`https://api.telegram.org/bot${token}/getMe`); const data = await res.json(); if (data.ok) { type === 'funnel' ? setTokenStatusFunnel('success') : setTokenStatusLm('success'); setVerifiedBotData(data.result); if (!builderForm.name) setBuilderForm(p => ({ ...p, name: data.result.first_name })); showToast(`Успішно: @${data.result.username}`); } else { type === 'funnel' ? setTokenStatusFunnel('error') : setTokenStatusLm('error'); showToast('Невірний токен', 'error'); } } catch (err) { type === 'funnel' ? setTokenStatusFunnel('error') : setTokenStatusLm('error'); showToast('Помилка API', 'error'); } };
   
+  const deleteBot = () => { if(window.confirm('Видалити цього бота?')) { saveStateToDb({ bots: bots.filter(b => b.id !== editingBot.id) }); setIsBuilderOpen(false); showToast('Бота видалено'); } };
+
   const saveBot = () => { 
       if (!builderForm.name) return showToast('Введіть ім\'я бота', 'error'); 
       setIsSaving(true); 
@@ -1263,7 +1130,6 @@ export default function App() {
       }, 600); 
   };
   
-  // ✅ ОНОВЛЕНО: Тепер кнопка просто змінює статус в БД, а Модуль 5 сам підхоплює його і запускає поллінг
   const toggleBotStatus = async (id) => { 
       const bot = bots.find(b => b.id === id);
       const newStatus = bot.status === 'Активний' ? 'Пауза' : 'Активний'; 
@@ -1282,7 +1148,6 @@ export default function App() {
   const saveCookieSettings = () => { setCookieConsent(cookieTempSettings); setIsCookieSettingsOpen(false); setIsCookieNoticeOpen(false); showToast('Налаштування cookies збережені'); };
 
   const activeLmFlow = builderForm.moduleConfigs['Лід-магніт']?.flows?.find(f => f.id === activeFlowId) || null;
-
 
   // ============================================================================
   // 📦 МОДУЛЬ 9: ВІЗУАЛЬНА ЧАСТИНА (RENDER HTML / ІНТЕРФЕЙС)
@@ -2476,52 +2341,106 @@ export default function App() {
                                                   </div>
                                                 )}
                                                 {step.type === 'wait_input' && (
-                                                    <div className="space-y-4"><div className="bg-purple-500/10 border border-purple-500/20 p-3 md:p-4 rounded-xl flex flex-col md:flex-row gap-3 items-start"><MessageSquare size={18} className="text-purple-400 mt-0.5 shrink-0 hidden md:block"/><div className="flex-grow space-y-3 w-full"><div className="flex items-center gap-2 md:hidden mb-2 border-b border-purple-500/20 pb-2"><Command size={16} className="text-purple-400 shrink-0"/><h4 className="text-sm font-bold text-white">Очікування тексту</h4></div><div><label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase block mb-1">Чекати поки клієнт напише (Кодове слово):</label><input type="text" value={step.expectedText} onChange={e => updateLmStep(step.id, 'expectedText', e.target.value)} placeholder="Наприклад: переглянув" className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-sm outline-none focus:border-purple-500" /></div><div><label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase block mb-1">Повідомлення про помилку (Якщо написав інше):</label><input type="text" value={step.fallbackText || ''} onChange={e => updateLmStep(step.id, 'fallbackText', e.target.value)} placeholder="Будь ласка, напишіть правильне слово..." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-sm outline-none focus:border-purple-500" /></div><div className="pt-3 mt-3 border-t border-purple-500/20"><label className="text-[10px] md:text-[11px] font-bold text-purple-400 uppercase block mb-2">Відповісти при успішному вводі:</label><textarea rows="2" value={step.successText || ''} onChange={e => updateLmStep(step.id, 'successText', e.target.value)} placeholder="Молодець, ось твоє відео..." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl px-4 py-3 text-white focus:border-purple-500 outline-none resize-none mb-3 text-base md:text-sm" /><div className="flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3"><select value={step.successMediaType || 'none'} onChange={e => updateLmStep(step.id, 'successMediaType', e.target.value)} className="bg-[#0B1120] border border-[#1F2937] rounded-xl px-3 py-3 md:py-2 text-white text-base md:text-sm outline-none focus:border-purple-500 w-full sm:w-40 shrink-0"><option value="none">Без медіа</option><option value="photo">Фото (URL)</option><option value="video">Відео (URL)</option><option value="document">Файл (URL)</option></select>{step.successMediaType && step.successMediaType !== 'none' && (<div className="flex-grow flex gap-2"><input type="url" value={step.successMediaUrl || ''} onChange={e => updateLmStep(step.id, 'successMediaUrl', e.target.value)} placeholder="Посилання на файл..." className="flex-grow bg-[#0B1120] border border-[#1F2937] rounded-xl px-3 py-3 md:py-2 text-white text-base md:text-sm outline-none focus:border-purple-500" /><button onClick={() => handleFileUpload(step.id, true)} className="shrink-0 w-11 h-11 md:w-10 md:h-10 bg-purple-600/20 text-purple-400 rounded-xl flex items-center justify-center hover:bg-purple-600/30 transition-colors" title="Завантажити з пристрою"><Upload size={16}/></button></div>)}</div></div></div></div></div>
+                                                    <div className="space-y-4">
+                                                        <div className="bg-purple-500/10 border border-purple-500/20 p-3 md:p-4 rounded-xl flex flex-col md:flex-row gap-3 items-start">
+                                                            <MessageSquare size={18} className="text-purple-400 mt-0.5 shrink-0 hidden md:block"/>
+                                                            <div className="flex-grow space-y-3 w-full">
+                                                                <div className="flex items-center gap-2 md:hidden mb-2 border-b border-purple-500/20 pb-2">
+                                                                    <Command size={16} className="text-purple-400 shrink-0"/>
+                                                                    <h4 className="text-sm font-bold text-white">Очікування тексту</h4>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase block mb-1">Чекати поки клієнт напише (Кодове слово):</label>
+                                                                    <input type="text" value={step.expectedText} onChange={e => updateLmStep(step.id, 'expectedText', e.target.value)} placeholder="Наприклад: переглянув" className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-sm outline-none focus:border-purple-500" />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase block mb-1">Повідомлення про помилку (Якщо написав інше):</label>
+                                                                    <input type="text" value={step.fallbackText || ''} onChange={e => updateLmStep(step.id, 'fallbackText', e.target.value)} placeholder="Будь ласка, напишіть правильне слово..." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-sm outline-none focus:border-purple-500" />
+                                                                </div>
+                                                                <div className="pt-3 mt-3 border-t border-purple-500/20">
+                                                                    <label className="text-[10px] md:text-[11px] font-bold text-purple-400 uppercase block mb-2">Відповісти при успішному вводі:</label>
+                                                                    <textarea rows="2" value={step.successText || ''} onChange={e => updateLmStep(step.id, 'successText', e.target.value)} placeholder="Молодець, ось твоє відео..." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl px-4 py-3 text-white focus:border-purple-500 outline-none resize-none mb-3 text-base md:text-sm" />
+                                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3">
+                                                                        <select value={step.successMediaType || 'none'} onChange={e => updateLmStep(step.id, 'successMediaType', e.target.value)} className="bg-[#0B1120] border border-[#1F2937] rounded-xl px-3 py-3 md:py-2 text-white text-base md:text-sm outline-none focus:border-purple-500 w-full sm:w-40 shrink-0">
+                                                                            <option value="none">Без медіа</option>
+                                                                            <option value="photo">Фото (URL)</option>
+                                                                            <option value="video">Відео (URL)</option>
+                                                                            <option value="document">Файл (URL)</option>
+                                                                        </select>
+                                                                        {step.successMediaType && step.successMediaType !== 'none' && (
+                                                                            <div className="flex-grow flex gap-2">
+                                                                                <input type="url" value={step.successMediaUrl || ''} onChange={e => updateLmStep(step.id, 'successMediaUrl', e.target.value)} placeholder="Посилання на файл..." className="flex-grow bg-[#0B1120] border border-[#1F2937] rounded-xl px-3 py-3 md:py-2 text-white text-base md:text-sm outline-none focus:border-purple-500" />
+                                                                                <button onClick={() => handleFileUpload(step.id, true)} className="shrink-0 w-11 h-11 md:w-10 md:h-10 bg-purple-600/20 text-purple-400 rounded-xl flex items-center justify-center hover:bg-purple-600/30 transition-colors" title="Завантажити з пристрою">
+                                                                                    <Upload size={16}/>
+                                                                                </button>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3 pt-6 border-t border-[#1F2937]">
-                                    <button onClick={() => addLmStep('message')} className="py-3 bg-[#131B2C] hover:bg-[#1E293B] border border-[#1F2937] rounded-xl text-white font-medium text-xs md:text-sm transition-colors shadow-sm flex items-center justify-center gap-2"><MessageSquare size={16} className="text-cyan-400"/> Повідомлення</button>
-                                    <button onClick={() => addLmStep('check_sub')} className="py-3 bg-[#131B2C] hover:bg-[#1E293B] border border-[#1F2937] rounded-xl text-white font-medium text-xs md:text-sm transition-colors shadow-sm flex items-center justify-center gap-2"><ShieldCheck size={16} className="text-blue-400"/> Перевірка підписки</button>
-                                    <button onClick={() => addLmStep('wait_input')} className="py-3 bg-[#131B2C] hover:bg-[#1E293B] border border-[#1F2937] rounded-xl text-white font-medium text-xs md:text-sm transition-colors shadow-sm flex items-center justify-center gap-2"><Command size={16} className="text-purple-400"/> Очікувати текст</button>
+                                
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-6">
+                                    <button onClick={() => addLmStep('message')} className="py-3 md:py-4 rounded-xl border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 transition-colors flex items-center justify-center gap-2 font-medium text-sm md:text-base"><MessageCircle size={18}/> Повідомлення</button>
+                                    <button onClick={() => addLmStep('wait_input')} className="py-3 md:py-4 rounded-xl border border-purple-500/30 text-purple-400 hover:bg-purple-500/10 transition-colors flex items-center justify-center gap-2 font-medium text-sm md:text-base"><Command size={18}/> Очікування слова</button>
+                                    <button onClick={() => addLmStep('check_sub')} className="py-3 md:py-4 rounded-xl border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors flex items-center justify-center gap-2 font-medium text-sm md:text-base"><ShieldCheck size={18}/> Перевірка підписки</button>
                                 </div>
                               </div>
                             )}
                           </div>
                         )}
 
-                        {/* --- БАЗОВА АВТОВОРОНКА --- */}
                         {activeConfigModule === 'Автоворонка' && (
-                          <div className="space-y-4 md:space-y-5">
-                            <div className="bg-[#131B2C] p-4 md:p-5 rounded-2xl border border-[#1F2937]"><label className="text-xs md:text-sm font-medium text-gray-300 mb-1.5 flex items-center gap-2"><Zap size={16} className="text-cyan-400"/> Тригер запуску</label><input type="text" value={builderForm.moduleConfigs['Автоворонка'].trigger || ''} onChange={e => updateModuleConfig('Автоворонка', 'trigger', e.target.value)} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl px-4 py-2.5 text-white focus:border-cyan-500 outline-none text-base md:text-sm" placeholder="/start" /></div>
-                            
-                            {/* НОВИЙ БЛОК: ПЕРЕВІРКА ПІДПИСКИ */}
-                            <div className="bg-[#131B2C] p-4 md:p-5 rounded-2xl border border-[#1F2937]">
-                                <div className="flex items-center justify-between mb-4">
-                                    <label className="text-xs md:text-sm font-medium text-white flex items-center gap-2"><ShieldCheck size={16} className="text-blue-400"/> Обов'язкова підписка на канал</label>
-                                    <div className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors shrink-0 ${builderForm.moduleConfigs['Автоворонка'].requireSub ? 'bg-cyan-500' : 'bg-gray-600'}`} onClick={() => updateModuleConfig('Автоворонка', 'requireSub', !builderForm.moduleConfigs['Автоворонка'].requireSub)}>
-                                         <div className={`w-4 h-4 bg-white rounded-full transition-transform ${builderForm.moduleConfigs['Автоворонка'].requireSub ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                                    </div>
-                                </div>
-                                {builderForm.moduleConfigs['Автоворонка'].requireSub && (
-                                    <div className="space-y-3 pt-3 border-t border-[#1F2937]">
-                                        <p className="text-[10px] md:text-[11px] text-blue-300 font-medium mb-2">Бот має бути Адміністратором у вашому каналі!</p>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            <div><label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase block mb-1">Посилання (URL) на канал:</label><input type="url" value={builderForm.moduleConfigs['Автоворонка'].channelUrl || ''} onChange={e => updateModuleConfig('Автоворонка', 'channelUrl', e.target.value)} placeholder="https://t.me/..." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-sm outline-none focus:border-blue-500" /></div>
-                                            <div><label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase block mb-1">ID каналу (для API):</label><input type="text" value={builderForm.moduleConfigs['Автоворонка'].channelId || ''} onChange={e => updateModuleConfig('Автоворонка', 'channelId', e.target.value)} placeholder="@channel_username" className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-sm outline-none focus:border-blue-500" /></div>
-                                        </div>
-                                        <div><label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase block mb-1">Текст з проханням підписатися:</label><input type="text" value={builderForm.moduleConfigs['Автоворонка'].subCheckText || ''} onChange={e => updateModuleConfig('Автоворонка', 'subCheckText', e.target.value)} placeholder="Підпишіться на канал..." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-sm outline-none focus:border-blue-500" /></div>
-                                        <div><label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase block mb-1">Помилка (якщо не підписався):</label><input type="text" value={builderForm.moduleConfigs['Автоворонка'].subErrorText || ''} onChange={e => updateModuleConfig('Автоворонка', 'subErrorText', e.target.value)} placeholder="Ви не підписані!" className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-sm outline-none focus:border-red-500" /></div>
-                                    </div>
-                                )}
-                            </div>
+                          <div className="space-y-4 md:space-y-6">
+                              <div className="bg-[#131B2C] p-4 md:p-5 rounded-2xl border border-[#1F2937]">
+                                  <label className="text-xs md:text-sm font-bold text-white block mb-1">Слово-тригер для запуску</label>
+                                  <input type="text" value={builderForm.moduleConfigs['Автоворонка']?.trigger || ''} onChange={e => updateModuleConfig('Автоворонка', 'trigger', e.target.value)} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none" placeholder="наприклад: /start або 'хочу'" />
+                              </div>
 
-                            <div className="bg-[#131B2C] p-4 md:p-5 rounded-2xl md:rounded-3xl border border-[#1F2937]">
-                                <h3 className="text-white font-medium mb-4 flex items-center gap-2 border-b border-[#1F2937] pb-3 text-sm md:text-base"><MessageSquare size={16} className="text-cyan-400"/> Відповідь бота (Базова)</h3>
-                                {(() => { const steps = builderForm.moduleConfigs['Автоворонка'].steps; const step = steps.length > 0 ? steps[0] : { id: 1, text: '', links: [] }; return ( <div className="space-y-4 md:space-y-5"><div><label className="text-[10px] md:text-[11px] uppercase text-gray-500 block mb-2 font-bold">Текст повідомлення</label><textarea rows="4" value={step.text || ''} onChange={e => updateStarterFunnel('text', null, e.target.value)} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none resize-none text-base md:text-sm" placeholder="Що відповість бот..." /></div><div className="pt-2"><label className="text-[10px] md:text-[11px] uppercase text-gray-500 block mb-2 font-bold">Веб-посилання під повідомленням (Кнопки)</label>{(step.links || []).map((link, idx) => (<div key={link.id || idx} className="flex flex-col sm:flex-row gap-2 mb-3 items-start bg-[#0B1120] sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-0 border-[#1F2937]"><input type="text" value={link.title} onChange={e => updateStarterFunnelLinks('update', idx, 'title', e.target.value)} placeholder="Назва (Мій Instagram)" className="w-full sm:w-1/3 bg-[#131B2C] sm:bg-[#0B1120] border border-[#1F2937] rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-white text-base md:text-sm outline-none focus:border-cyan-500" /><input type="url" value={link.url} onChange={e => updateStarterFunnelLinks('update', idx, 'url', e.target.value)} placeholder="Посилання (https://...)" className="w-full sm:flex-1 bg-[#131B2C] sm:bg-[#0B1120] border border-[#1F2937] rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-white text-base md:text-sm outline-none focus:border-cyan-500" /><button onClick={() => updateStarterFunnelLinks('delete', idx)} className="w-full sm:w-10 h-10 shrink-0 flex items-center justify-center text-gray-500 hover:text-red-400 bg-zinc-800 sm:bg-[#0B1120] border sm:border border-[#1F2937] rounded-lg sm:rounded-xl mt-1 sm:mt-0"><Trash2 size={16}/></button></div>))}<button onClick={() => updateStarterFunnelLinks('add')} className="w-full py-3 md:py-2.5 bg-blue-600/10 hover:bg-blue-600/20 text-cyan-400 text-sm font-medium rounded-xl border border-cyan-500/20 transition-colors flex items-center justify-center gap-2"><LinkIcon size={16}/> Додати веб-посилання</button></div></div> ); })()}
-                            </div>
+                              <div className="bg-[#131B2C] p-4 md:p-5 rounded-2xl border border-[#1F2937] space-y-4">
+                                  <div className="flex items-center justify-between border-b border-[#1F2937] pb-4 mb-4">
+                                      <div>
+                                          <h4 className="font-bold text-white text-sm md:text-base">Обов'язкова підписка (Gate)</h4>
+                                          <p className="text-[11px] md:text-xs text-gray-400 mt-1">Вимагати підписку на ваш канал перед видачею контенту.</p>
+                                      </div>
+                                      <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                          <input type="checkbox" checked={builderForm.moduleConfigs['Автоворонка']?.requireSub || false} onChange={e => updateModuleConfig('Автоворонка', 'requireSub', e.target.checked)} className="sr-only peer" />
+                                          <div className="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                                      </label>
+                                  </div>
+                                  
+                                  {builderForm.moduleConfigs['Автоворонка']?.requireSub && (
+                                      <div className="space-y-4 animate-in slide-in-from-top-2">
+                                          <div className="bg-blue-500/10 p-3 rounded-xl border border-blue-500/20 text-[10px] md:text-xs text-blue-300">Бот повинен бути <b>Адміністратором</b> у цьому каналі, щоб мати право перевіряти підписку через API!</div>
+                                          <div><label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-1">Посилання на канал (для кнопки)</label><input type="url" value={builderForm.moduleConfigs['Автоворонка']?.channelUrl || ''} onChange={e => updateModuleConfig('Автоворонка', 'channelUrl', e.target.value)} placeholder="https://t.me/..." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none text-sm" /></div>
+                                          <div><label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-1">Username каналу (для API бота)</label><input type="text" value={builderForm.moduleConfigs['Автоворонка']?.channelId || ''} onChange={e => updateModuleConfig('Автоворонка', 'channelId', e.target.value)} placeholder="@channel_username" className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none text-sm" /></div>
+                                          <div><label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-1">Текст перед перевіркою</label><input type="text" value={builderForm.moduleConfigs['Автоворонка']?.subCheckText || ''} onChange={e => updateModuleConfig('Автоворонка', 'subCheckText', e.target.value)} placeholder="Підпишіться на канал, щоб продовжити:" className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none text-sm" /></div>
+                                          <div><label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-1">Текст помилки (якщо не підписався)</label><input type="text" value={builderForm.moduleConfigs['Автоворонка']?.subErrorText || ''} onChange={e => updateModuleConfig('Автоворонка', 'subErrorText', e.target.value)} placeholder="Ви не підписались! Спробуйте ще раз." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none text-sm" /></div>
+                                      </div>
+                                  )}
+                              </div>
+
+                              <div className="bg-[#131B2C] p-4 md:p-5 rounded-2xl border border-[#1F2937]">
+                                  <h4 className="font-bold text-white text-sm md:text-base mb-4 flex items-center gap-2"><MessageCircle size={18} className="text-cyan-400"/> Повідомлення при успіху</h4>
+                                  <textarea rows="4" value={builderForm.moduleConfigs['Автоворонка']?.steps?.[0]?.text || ''} onChange={e => updateStarterFunnel('text', 0, e.target.value)} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none resize-none mb-4 text-base md:text-sm" placeholder="Ваше повідомлення (або посилання на файл)..." />
+                                  <div className="pt-4 border-t border-[#1F2937]">
+                                      <label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-3">Прикріплені кнопки-посилання</label>
+                                      {(builderForm.moduleConfigs['Автоворонка']?.steps?.[0]?.links || []).map((link, idx) => (
+                                          <div key={link.id} className="flex flex-col sm:flex-row gap-2 items-start bg-[#0B1120] p-3 rounded-xl border border-[#1F2937] mb-2">
+                                              <input type="text" value={link.title} onChange={e => updateStarterFunnelLinks('update', idx, 'title', e.target.value)} placeholder="Текст на кнопці" className="w-full sm:w-1/3 bg-[#131B2C] border border-[#1F2937] rounded-lg px-3 py-2.5 sm:py-2 text-white text-base md:text-sm outline-none focus:border-cyan-500" />
+                                              <input type="url" value={link.url} onChange={e => updateStarterFunnelLinks('update', idx, 'url', e.target.value)} placeholder="https://..." className="w-full sm:flex-grow bg-[#131B2C] border border-[#1F2937] rounded-lg px-3 py-2.5 sm:py-2 text-white text-base md:text-sm outline-none focus:border-cyan-500" />
+                                              <button onClick={() => updateStarterFunnelLinks('delete', idx)} className="w-full sm:w-9 h-10 sm:h-9 flex items-center justify-center text-gray-500 hover:text-red-400 bg-zinc-800 sm:bg-transparent rounded-lg shrink-0 mt-1 sm:mt-0"><Trash2 size={16} /></button>
+                                          </div>
+                                      ))}
+                                      <button onClick={() => updateStarterFunnelLinks('add')} className="w-full py-3 sm:py-2 mt-2 bg-[#0B1120] hover:bg-zinc-800 text-cyan-400 text-sm rounded-xl border border-[#1F2937] transition-colors flex items-center justify-center gap-2"><Plus size={16}/> Додати веб-посилання</button>
+                                  </div>
+                              </div>
                           </div>
                         )}
                       </div>
@@ -2529,133 +2448,131 @@ export default function App() {
                   </div>
                 )}
 
-                {/* MENU BUILDER & PHONE SIMULATOR */}
                 {builderTab === 'menu' && (
-                  <div className="flex flex-col lg:flex-row gap-6 h-full animate-in fade-in duration-300">
-                    <div className="flex-1 bg-[#131B2C] border border-[#1F2937] p-4 md:p-5 rounded-2xl md:rounded-3xl h-full flex flex-col">
-                      <div className="mb-4 flex justify-between items-start"><div><h3 className="text-base md:text-lg font-bold text-white flex items-center gap-2"><Command size={18} className="text-cyan-400"/> Меню бота</h3></div><button onClick={loadSmmMenuPreset} className="px-3 py-1.5 bg-[#0B1120] border border-[#1F2937] rounded-lg text-xs text-cyan-400">Шаблон</button></div>
-                      <div className="flex-grow space-y-3 overflow-y-auto pb-4 pr-1">
-                        {builderForm.menu.map((item, idx) => (
-                          <div key={idx} className="flex flex-col gap-2 bg-[#0B1120] p-3 rounded-2xl border border-[#1F2937]">
-                              <div className="flex flex-col sm:flex-row gap-2 items-start">
-                                  <div className="w-full sm:flex-1 relative">
-                                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-mono text-sm">/</span>
-                                      <input type="text" value={item.command} onChange={e => updateMenuCommand(idx, 'command', e.target.value)} placeholder="команда" className="w-full bg-[#131B2C] border border-[#1F2937] rounded-xl pl-6 pr-2 py-2 text-white font-mono text-base md:text-sm outline-none focus:border-cyan-500" />
-                                  </div>
-                                  <div className="flex w-full sm:w-auto sm:flex-[2] gap-2">
-                                      <input type="text" value={item.description} onChange={e => updateMenuCommand(idx, 'description', e.target.value)} placeholder="Опис (в меню)" className="flex-grow bg-[#131B2C] border border-[#1F2937] rounded-xl px-3 py-2 text-white text-base md:text-sm outline-none focus:border-cyan-500" />
-                                      <button onClick={() => removeMenuCommand(idx)} className="w-10 h-10 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center text-gray-500 hover:text-red-400 bg-[#131B2C] border border-[#1F2937] rounded-xl"><Trash2 size={16}/></button>
-                                  </div>
-                              </div>
-                              <div className="pt-2 border-t border-[#1F2937] mt-1">
-                                  <label className="text-[10px] md:text-[11px] font-bold text-gray-500 uppercase mb-1.5 block">Відповідь бота (Текст та Медіа)</label>
-                                  <textarea rows="2" value={item.message || ''} onChange={e => updateMenuCommand(idx, 'message', e.target.value)} placeholder="Текст повідомлення..." className="w-full bg-[#131B2C] border border-[#1F2937] rounded-xl px-3 py-2 text-white text-base md:text-sm outline-none focus:border-cyan-500 resize-none mb-2" />
-                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3 mb-3">
-                                      <select value={item.mediaType || 'none'} onChange={e => updateMenuCommand(idx, 'mediaType', e.target.value)} className="bg-[#131B2C] border border-[#1F2937] rounded-xl px-3 py-2.5 md:py-2 text-white text-base md:text-sm outline-none focus:border-cyan-500 w-full sm:w-40 shrink-0">
-                                          <option value="none">Без медіа</option>
-                                          <option value="photo">📷 Фото (URL)</option>
-                                          <option value="video">🎥 Відео (URL)</option>
-                                          <option value="document">📄 Файл (URL)</option>
-                                      </select>
-                                      {item.mediaType && item.mediaType !== 'none' && (
-                                          <div className="flex-grow flex gap-2">
-                                              <input type="url" value={item.mediaUrl || ''} onChange={e => updateMenuCommand(idx, 'mediaUrl', e.target.value)} placeholder="Посилання на файл..." className="flex-grow bg-[#131B2C] border border-[#1F2937] rounded-xl px-3 py-2.5 md:py-2 text-white text-base md:text-sm outline-none focus:border-cyan-500" />
-                                          </div>
-                                      )}
-                                  </div>
-                                  <label className="text-[10px] md:text-[11px] font-bold text-gray-500 uppercase mb-1.5 block">Веб-посилання (Кнопки під відповіддю)</label>
-                                  {(item.links || []).map((link, lidx) => (
-                                      <div key={link.id || lidx} className="flex flex-col sm:flex-row gap-2 mb-2 items-start bg-[#131B2C] p-2 rounded-lg border border-[#1F2937]">
-                                          <input type="text" value={link.title} onChange={e => handleMenuLink('update', idx, lidx, 'title', e.target.value)} placeholder="Назва" className="w-full sm:w-1/3 bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-xs outline-none focus:border-cyan-500" />
-                                          <div className="flex w-full sm:w-auto sm:flex-1 gap-2">
-                                              <input type="url" value={link.url} onChange={e => handleMenuLink('update', idx, lidx, 'url', e.target.value)} placeholder="https://..." className="flex-grow bg-[#0B1120] border border-[#1F2937] rounded-lg px-3 py-2 text-white text-base md:text-xs outline-none focus:border-cyan-500" />
-                                              <button onClick={() => handleMenuLink('delete', idx, lidx)} className="w-10 h-10 sm:w-8 sm:h-8 shrink-0 flex items-center justify-center text-gray-500 hover:text-red-400 bg-zinc-800 sm:bg-[#0B1120] border sm:border border-[#1F2937] rounded-lg"><Trash2 size={14}/></button>
-                                          </div>
-                                      </div>
-                                  ))}
-                                  <button onClick={() => handleMenuLink('add', idx)} className="w-full py-2.5 md:py-2 bg-[#131B2C] hover:bg-[#1E293B] text-cyan-400 text-sm md:text-xs font-medium rounded-lg border border-[#1F2937] transition-colors flex items-center justify-center gap-1 mt-2 md:mt-1"><LinkIcon size={12}/> Додати посилання</button>
-                              </div>
-                          </div>
-                        ))}
+                  <div className="space-y-4 md:space-y-6 max-w-4xl animate-in fade-in duration-300 mx-auto md:mx-0">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#131B2C] border border-[#1F2937] p-4 md:p-5 rounded-2xl md:rounded-3xl">
+                      <div>
+                        <h3 className="text-base md:text-lg font-bold text-white mb-1">Меню команд (Telegram Menu)</h3>
+                        <p className="text-[11px] md:text-sm text-gray-400">Ці команди будуть доступні в меню Telegram (зліва від поля вводу).</p>
                       </div>
-                      <button onClick={addMenuCommand} className="w-full py-3.5 md:py-3 mt-auto bg-blue-600/10 border border-cyan-500/20 rounded-xl text-cyan-400 text-sm font-medium">Додати команду</button>
+                      <button onClick={loadSmmMenuPreset} className="w-full sm:w-auto px-4 py-2.5 bg-blue-600/10 text-cyan-400 border border-cyan-500/20 hover:bg-blue-600/20 rounded-xl transition-colors text-sm font-medium whitespace-nowrap">
+                         Завантажити шаблон
+                      </button>
                     </div>
 
-                    {/* РАБОЧИЙ СИМУЛЯТОР ТЕЛЕФОНА */}
-                    <div className="w-full max-w-[340px] mx-auto lg:w-[340px] bg-[#8BA7B6] rounded-[2.5rem] border-[8px] md:border-[10px] border-[#0A0F1D] shadow-[0_0_40px_rgba(0,0,0,0.5)] flex flex-col shrink-0 h-[600px] lg:h-[650px] overflow-hidden relative">
-                        <div className="bg-[#17212B] px-3 py-2 flex items-center gap-3 shrink-0 mt-5 md:mt-6 shadow-md relative z-20"><ChevronLeft size={24} className="text-[#5288C1]" /><div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-cyan-400 flex justify-center items-center"><Bot size={20} className="text-white"/></div><div><div className="text-white font-medium text-[14px] md:text-[15px] truncate w-28 md:w-32">{builderForm.name || 'Бот'}</div><div className="text-[#5288C1] text-[11px] md:text-[12px]">bot</div></div></div>
-                        <div className="flex-grow bg-[#0E1621] relative overflow-y-auto p-3 space-y-3 scrollbar-none pb-[80px]">
-                            <div className="text-center text-[#5288C1] text-[10px] md:text-xs my-2 font-medium">Сьогодні</div>
-                            {previewChat.map((msg, i) => (
-                                <div key={i} className={`flex flex-col max-w-[85%] ${msg.sender === 'bot' ? 'self-start items-start' : 'self-end items-end ml-auto'}`}>
-                                    <div className={`p-3 rounded-2xl text-[14px] md:text-[15px] shadow-sm relative ${msg.sender === 'bot' ? 'bg-[#182533] text-white rounded-bl-sm' : 'bg-[#2B5278] text-white rounded-br-sm'}`}>
-                                        {msg.mediaType === 'photo' && <div className="w-full h-24 md:h-32 bg-[#0E1621] rounded-lg mb-2 flex items-center justify-center text-[#5288C1] border border-[#1F2937]"><Upload size={24}/></div>}
-                                        {msg.mediaType === 'video' && <div className="w-full h-24 md:h-32 bg-[#0E1621] rounded-lg mb-2 flex items-center justify-center text-[#5288C1] border border-[#1F2937] relative"><Play size={24}/><div className="absolute bottom-2 right-2 bg-black/50 text-[10px] px-1 rounded">0:15</div></div>}
-                                        {msg.mediaType === 'document' && <div className="w-full bg-[#0E1621] rounded-lg p-2 mb-2 flex items-center gap-2 md:gap-3 border border-[#1F2937]"><div className="w-8 h-8 md:w-10 md:h-10 bg-[#2B5278] rounded-full flex items-center justify-center shrink-0"><FileText size={16} className="text-white md:w-5 md:h-5"/></div><div className="flex-1 overflow-hidden"><p className="text-xs md:text-sm font-medium truncate">file.pdf</p><p className="text-[10px] md:text-xs text-[#5288C1]">2.4 MB</p></div></div>}
-                                        <p className="whitespace-pre-wrap leading-tight">{msg.text}</p>
-                                        <span className={`text-[9px] md:text-[10px] float-right mt-1 ml-2 ${msg.sender === 'bot' ? 'text-[#5288C1]' : 'text-blue-300'}`}>12:00</span>
+                    {builderForm.menu.length === 0 ? (
+                      <div className="bg-[#131B2C] border border-[#1F2937] rounded-2xl md:rounded-3xl p-8 md:p-10 flex flex-col items-center text-center">
+                         <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#0B1120] flex items-center justify-center mb-4"><LayoutList size={24} className="text-gray-500 md:w-8 md:h-8"/></div>
+                         <h4 className="text-white font-bold text-base md:text-lg mb-2">Меню команд порожнє</h4>
+                         <p className="text-gray-400 text-xs md:text-sm max-w-md mx-auto mb-6">Додайте команди (наприклад /start, /help, /services), щоб користувачам було зручно навігувати по вашому боту.</p>
+                         <button onClick={addMenuCommand} className="bg-[#1E293B] hover:bg-[#2D3748] text-white px-6 py-2.5 md:py-3 rounded-xl text-sm font-medium transition-colors">+ Додати команду</button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {builderForm.menu.map((item, idx) => (
+                          <div key={idx} className="bg-[#131B2C] border border-[#1F2937] rounded-2xl p-4 md:p-5">
+                            <div className="flex justify-between items-start mb-4">
+                               <div className="flex items-center gap-2"><div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#0B1120] flex items-center justify-center font-mono text-[10px] md:text-xs font-bold text-cyan-400 border border-[#1F2937]">{idx + 1}</div><h4 className="text-sm md:text-base font-bold text-white">Команда меню</h4></div>
+                               <button onClick={() => removeMenuCommand(idx)} className="text-gray-500 hover:text-red-400 p-1 transition-colors"><Trash2 size={16} className="md:w-[18px] md:h-[18px]" /></button>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mb-4">
+                              <div><label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-1">Команда (без /)</label><div className="relative"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">/</span><input type="text" value={item.command} onChange={e => updateMenuCommand(idx, 'command', e.target.value)} placeholder="start" className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl pl-7 pr-4 py-2.5 md:py-2 text-white focus:border-cyan-500 outline-none text-base md:text-sm" /></div></div>
+                              <div><label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-1">Опис у меню</label><input type="text" value={item.description} onChange={e => updateMenuCommand(idx, 'description', e.target.value)} placeholder="Головне меню" maxLength={64} className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl px-4 py-2.5 md:py-2 text-white focus:border-cyan-500 outline-none text-base md:text-sm" /></div>
+                            </div>
+                            <div className="mb-4">
+                                <label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-1">Текст відповіді бота</label>
+                                <textarea rows="3" value={item.message} onChange={e => updateMenuCommand(idx, 'message', e.target.value)} placeholder="Що відповість бот на цю команду..." className="w-full bg-[#0B1120] border border-[#1F2937] rounded-xl px-4 py-3 text-white focus:border-cyan-500 outline-none resize-none text-base md:text-sm" />
+                            </div>
+                            <div className="pt-4 border-t border-[#1F2937]">
+                                <label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase block mb-3">Прикріплені кнопки (Опціонально)</label>
+                                {(item.links || []).map((link, linkIdx) => (
+                                    <div key={link.id} className="flex flex-col sm:flex-row gap-2 items-start bg-[#0B1120] p-3 rounded-xl border border-[#1F2937] mb-2">
+                                        <input type="text" value={link.title} onChange={e => handleMenuLink('update', idx, linkIdx, 'title', e.target.value)} placeholder="Текст кнопки (Прайс)" className="w-full sm:w-1/3 bg-[#131B2C] border border-[#1F2937] rounded-lg px-3 py-2.5 sm:py-2 text-white text-base md:text-sm outline-none focus:border-cyan-500" />
+                                        <input type="url" value={link.url} onChange={e => handleMenuLink('update', idx, linkIdx, 'url', e.target.value)} placeholder="https://..." className="w-full sm:flex-grow bg-[#131B2C] border border-[#1F2937] rounded-lg px-3 py-2.5 sm:py-2 text-white text-base md:text-sm outline-none focus:border-cyan-500" />
+                                        <button onClick={() => handleMenuLink('delete', idx, linkIdx)} className="w-full sm:w-9 h-10 sm:h-9 flex items-center justify-center text-gray-500 hover:text-red-400 bg-zinc-800 sm:bg-transparent rounded-lg shrink-0 mt-1 sm:mt-0"><Trash2 size={16} /></button>
                                     </div>
-                                    {msg.buttons && msg.buttons.length > 0 && (
-                                        <div className="flex flex-col gap-1 w-full mt-1">
-                                            {msg.buttons.map((btn, idx) => (
-                                                <button key={idx} onClick={() => handleSimulatorButton(btn, msg.currentFlowId)} className="w-full bg-[#182533] text-[#5288C1] hover:bg-[#202E3D] py-2 rounded-xl text-xs md:text-sm font-medium transition-colors border border-[#1F2937]/50 shadow-sm flex justify-center items-center gap-1">
-                                                  {btn.actionType === 'url' && <LinkIcon size={12}/>}
-                                                  {btn.title}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                            <div ref={chatEndRef} />
-                        </div>
-                        <div className="absolute bottom-0 left-0 right-0 bg-[#17212B] p-2 flex items-center gap-2 border-t border-[#0A0F1D]/50 z-20 pb-6 md:pb-2">
-                            <button className="text-[#5288C1] p-2 hover:bg-white/5 rounded-full transition-colors shrink-0"><Upload size={20} className="md:w-6 md:h-6" /></button>
-                            <input type="text" value={previewInput} onChange={e => setPreviewInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendPreviewMsg()} placeholder="Повідомлення..." className="flex-grow bg-[#0E1621] text-white rounded-full px-3 md:px-4 py-1.5 md:py-2 outline-none text-[14px] md:text-[15px]" />
-                            {previewInput.trim() ? (
-                                <button onClick={() => sendPreviewMsg()} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#5288C1] flex items-center justify-center text-white hover:bg-[#6398D1] transition-colors shrink-0"><Send size={14} className="-ml-0.5 md:w-4 md:h-4" /></button>
-                            ) : (
-                                <button className="text-[#5288C1] p-2 hover:bg-white/5 rounded-full transition-colors shrink-0"><MessageCircle size={20} className="md:w-6 md:h-6" /></button>
-                            )}
-                        </div>
-                    </div>
+                                ))}
+                                <button onClick={() => handleMenuLink('add', idx)} className="w-full py-3 sm:py-2 mt-2 bg-[#0B1120] hover:bg-zinc-800 text-cyan-400 text-sm rounded-xl border border-[#1F2937] transition-colors flex items-center justify-center gap-2"><Plus size={16}/> Додати веб-посилання</button>
+                            </div>
+                          </div>
+                        ))}
+                        <button onClick={addMenuCommand} className="w-full py-3 md:py-4 border-2 border-dashed border-[#1F2937] hover:border-cyan-500/50 text-gray-400 hover:text-cyan-400 rounded-2xl flex justify-center items-center gap-2 font-medium transition-colors text-sm md:text-base"><Plus size={18}/> Додати ще команду</button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-              
-              {isSaving && (
-                <div className="absolute inset-0 bg-[#0B1120]/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-3xl">
-                  <Loader2 size={48} className="text-cyan-400 animate-spin mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">Зберігаємо налаштування...</h3>
-                  <p className="text-gray-400 text-sm">Синхронізація з Telegram API</p>
-                </div>
-              )}
-              
-              <div className="p-4 md:p-6 border-t border-[#1F2937] bg-[#0B1120] flex justify-between items-center shrink-0 rounded-b-none md:rounded-b-3xl">
-                {editingBot && !activeConfigModule ? <button onClick={deleteBot} className="text-red-400 hover:text-red-300 font-medium px-3 md:px-4 py-2 md:py-2.5 transition-colors border border-red-500/20 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-xs md:text-sm">Видалити бота</button> : <div></div>}
-                <div className="flex gap-2 md:gap-3">
-                  <button onClick={() => setIsBuilderOpen(false)} className="px-4 md:px-6 py-2 md:py-2.5 rounded-xl border border-[#1F2937] text-gray-400 hover:text-white transition-colors text-xs md:text-sm font-medium hover:bg-[#131B2C]">Скасувати</button>
-                  <button onClick={saveBot} disabled={!builderForm.name || isSaving} className="px-6 md:px-8 py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold transition-all transform active:scale-95 shadow-[0_0_15px_rgba(34,211,238,0.3)] flex items-center gap-2 text-xs md:text-sm">{isSaving ? <Loader2 size={16} className="animate-spin" /> : <><Save size={16} className="md:w-4 md:h-4" /> Зберегти бота</>}</button>
+
+              {/* FOOTER МОДАЛКИ */}
+              <div className="p-4 md:p-6 border-t border-[#1F2937] bg-[#0B1120] flex flex-col-reverse sm:flex-row justify-between items-center gap-4 shrink-0 relative z-20">
+                {editingBot && (
+                  <button disabled={isSaving} onClick={deleteBot} className="w-full sm:w-auto text-gray-500 hover:text-red-400 text-sm font-medium transition-colors flex justify-center py-2 sm:py-0 disabled:opacity-50">Видалити бота</button>
+                )}
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button disabled={isSaving} onClick={() => setIsBuilderOpen(false)} className="flex-1 sm:flex-none px-4 py-3 md:py-2.5 rounded-xl border border-[#1F2937] text-gray-400 hover:text-white transition-colors text-sm font-medium disabled:opacity-50">Скасувати</button>
+                  <button disabled={isSaving} onClick={saveBot} className="flex-1 sm:flex-none px-6 py-3 md:py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold hover:scale-105 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(34,211,238,0.3)] text-sm disabled:opacity-75 disabled:scale-100">
+                    {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Зберегти {isSaving ? '...' : ''}
+                  </button>
                 </div>
               </div>
             </div>
+
+            {/* SIMULATOR SIDEBAR */}
+            <div className="hidden lg:flex w-80 xl:w-96 bg-[#0B1120] border-l border-[#1F2937] flex-col shrink-0 h-full relative overflow-hidden group/sim">
+               <div className="p-4 border-b border-[#1F2937] bg-[#131B2C] flex items-center justify-between z-10 shrink-0">
+                  <h3 className="font-bold text-white flex items-center gap-2 text-sm"><Play size={16} className="text-cyan-400"/> Симулятор</h3>
+                  <button onClick={() => setPreviewChat([])} className="text-xs text-gray-500 hover:text-cyan-400 transition-colors">Очистити</button>
+               </div>
+               
+               <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-[#0B1120] to-[#0A0F1D] custom-scrollbar scroll-smooth relative z-0">
+                  {previewChat.length === 0 ? (
+                      <div className="h-full flex flex-col items-center justify-center text-gray-500 text-center px-4">
+                          <Bot size={32} className="mb-3 opacity-50"/>
+                          <p className="text-[11px] xl:text-xs">Тут буде відображатись робота вашого бота. Напишіть щось, щоб почати.</p>
+                      </div>
+                  ) : (
+                      previewChat.map((msg, i) => (
+                          <div key={i} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} max-w-[90%] ${msg.sender === 'user' ? 'ml-auto' : 'mr-auto'} animate-in slide-in-from-bottom-2 duration-300`}>
+                              <div className={`p-2.5 xl:p-3 rounded-2xl ${msg.sender === 'user' ? 'bg-cyan-600 text-white rounded-tr-sm shadow-sm' : 'bg-[#131B2C] text-gray-200 rounded-tl-sm border border-[#1F2937]'} text-[12px] xl:text-[13px] leading-relaxed break-words whitespace-pre-wrap`}>
+                                  {msg.mediaType === 'photo' && msg.mediaUrl && <img src={msg.mediaUrl} alt="media" className="max-w-full h-auto rounded-lg mb-2 border border-[#1F2937] object-cover max-h-[150px] bg-[#0A0F1D]" />}
+                                  {msg.mediaType === 'video' && msg.mediaUrl && <video src={msg.mediaUrl} controls className="max-w-full h-auto rounded-lg mb-2 border border-[#1F2937] object-cover max-h-[150px] bg-[#0A0F1D]" />}
+                                  {msg.mediaType === 'document' && msg.mediaUrl && <div className="bg-[#0A0F1D] p-2 rounded-lg border border-[#1F2937] flex items-center gap-2 mb-2"><FileText size={16} className="text-cyan-400"/><span className="text-[10px] text-gray-400 truncate">Документ/Файл</span></div>}
+                                  {msg.text}
+                              </div>
+                              {msg.buttons && msg.buttons.length > 0 && (
+                                  <div className={`mt-1.5 flex flex-col gap-1 w-full max-w-[200px] ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                                      {msg.buttons.map((btn, bIdx) => (
+                                          <button key={bIdx} onClick={() => handleSimulatorButton(btn, msg.currentFlowId)} className={`w-full py-1.5 px-3 rounded-xl border text-[11px] font-medium transition-colors text-center truncate ${btn.actionType === 'url' ? 'bg-[#1E293B]/50 border-gray-600 text-gray-300 hover:bg-[#1E293B]' : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'}`}>
+                                              {btn.actionType === 'url' ? '🌐 ' : ''}{btn.title}
+                                          </button>
+                                      ))}
+                                  </div>
+                              )}
+                          </div>
+                      ))
+                  )}
+                  <div ref={chatEndRef} />
+               </div>
+
+               <div className="p-3 border-t border-[#1F2937] bg-[#131B2C] z-10 shrink-0">
+                  <div className="relative flex items-center">
+                      <input 
+                          type="text" 
+                          value={previewInput} 
+                          onChange={e => setPreviewInput(e.target.value)} 
+                          onKeyDown={e => e.key === 'Enter' && sendPreviewMsg()} 
+                          placeholder="Написати боту (/start)..." 
+                          className="w-full bg-[#0B1120] border border-[#1F2937] rounded-full pl-4 pr-10 py-2.5 text-xs text-white focus:border-cyan-500 outline-none" 
+                      />
+                      <button onClick={() => sendPreviewMsg()} className="absolute right-1 w-8 h-8 flex items-center justify-center bg-cyan-500 rounded-full text-[#0A0F1D] hover:bg-cyan-400 transition-colors"><ArrowRight size={14}/></button>
+                  </div>
+               </div>
+            </div>
+
           </div>
         </div>
       )}
+
     </div>
   );
-}
-
-// --- АВТОМАТИЧНИЙ ЗАПУСК ДЛЯ VERCEL ---
-// Цей блок коду дає команду браузеру намалювати інтерфейс на реальному сайті.
-if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  setTimeout(() => {
-    const rootElement = document.getElementById('root');
-    // Перевіряємо, чи корінь порожній (щоб не малювати двічі)
-    if (rootElement && rootElement.childElementCount === 0) {
-      import('react-dom/client').then(({ createRoot }) => {
-        createRoot(rootElement).render(<App />);
-      }).catch(err => console.error("Помилка рендерингу:", err));
-    }
-  }, 100);
 }
