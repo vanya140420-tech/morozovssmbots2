@@ -1102,31 +1102,46 @@ export default function App() {
   const removeMenuCommand = (idx) => setBuilderForm(p => ({ ...p, menu: p.menu.filter((_, i) => i !== idx) }));
   const loadSmmMenuPreset = () => setBuilderForm(p => ({ ...p, menu: [{ command: 'start', description: 'Головне меню', message: 'Привіт! Я бот-асистент.', mediaType: 'none', mediaUrl: '', links: [] }, { command: 'services', description: 'Послуги', message: 'Ось перелік наших послуг:\n1. SMM', mediaType: 'none', mediaUrl: '', links: [] }, { command: 'contact', description: 'Зв\'язатися', message: 'Напишіть нашому менеджеру', mediaType: 'none', mediaUrl: '', links: [] }]}));
   const verifyTelegramToken = async (type) => { const token = type === 'funnel' ? builderForm.tokenFunnel : builderForm.tokenLm; if (!token) return showToast('Введіть токен', 'error'); type === 'funnel' ? setTokenStatusFunnel('loading') : setTokenStatusLm('loading'); try { const res = await fetch(`https://api.telegram.org/bot${token}/getMe`); const data = await res.json(); if (data.ok) { type === 'funnel' ? setTokenStatusFunnel('success') : setTokenStatusLm('success'); setVerifiedBotData(data.result); if (!builderForm.name) setBuilderForm(p => ({ ...p, name: data.result.first_name })); showToast(`Успішно: @${data.result.username}`); } else { type === 'funnel' ? setTokenStatusFunnel('error') : setTokenStatusLm('error'); showToast('Невірний токен', 'error'); } } catch (err) { type === 'funnel' ? setTokenStatusFunnel('error') : setTokenStatusLm('error'); showToast('Помилка API', 'error'); } };
-  const saveBot = () => { if (!builderForm.name) return showToast('Введіть ім\'я бота', 'error'); setIsSaving(true); setTimeout(() => { const cleanMenu = builderForm.menu.filter(m => m.command.trim() && m.description.trim()); const botDataToSave = { ...builderForm, menu: cleanMenu, modules: builderForm.modules }; const pushMenu = async (tokenStr) => { if (tokenStr && cleanMenu.length > 0) { await fetch(`https://api.telegram.org/bot${tokenStr}/setMyCommands`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ commands: cleanMenu.map(m => ({command: m.command, description: m.description})) }) }).catch(()=>{}); } else if (tokenStr && cleanMenu.length === 0) { await fetch(`https://api.telegram.org/bot${tokenStr}/deleteMyCommands`).catch(()=>{}); } }; pushMenu(botDataToSave.tokenFunnel); pushMenu(botDataToSave.tokenLm); if (editingBot) { saveStateToDb({ bots: bots.map(b => b.id === editingBot.id ? { ...b, ...botDataToSave, username: verifiedBotData?.username || b.username } : b) }); showToast('Налаштування збережено'); } else { saveStateToDb({ bots: [...bots, { id: Date.now(), userId: currentUser.id, ...botDataToSave, username: verifiedBotData?.username || 'new_bot', status: 'Активний', users: 0, interactions: 0, uniqueUserIds: [] }] }); showToast('Бота створено!'); } setIsSaving(false); setIsBuilderOpen(false); }, 600); };
-  const deleteBot = () => { if (editingBot) { saveStateToDb({ bots: bots.filter(b => b.id !== editingBot.id) }); setIsBuilderOpen(false); showToast('Бота видалено', 'error'); } };
   
+  const saveBot = () => { 
+      if (!builderForm.name) return showToast('Введіть ім\'я бота', 'error'); 
+      setIsSaving(true); 
+      setTimeout(() => { 
+          const cleanMenu = builderForm.menu.filter(m => m.command.trim() && m.description.trim()); 
+          const botDataToSave = { ...builderForm, menu: cleanMenu, modules: builderForm.modules }; 
+          
+          const pushMenu = async (tokenStr) => { 
+              if (tokenStr && cleanMenu.length > 0) { 
+                  await fetch(`https://api.telegram.org/bot${tokenStr}/setMyCommands`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ commands: cleanMenu.map(m => ({command: m.command, description: m.description})) }) }).catch(()=>{}); 
+              } else if (tokenStr && cleanMenu.length === 0) { 
+                  await fetch(`https://api.telegram.org/bot${tokenStr}/deleteMyCommands`).catch(()=>{}); 
+              } 
+          }; 
+          pushMenu(botDataToSave.tokenFunnel); 
+          pushMenu(botDataToSave.tokenLm); 
+          
+          if (editingBot) { 
+              saveStateToDb({ bots: bots.map(b => b.id === editingBot.id ? { ...b, ...botDataToSave, username: verifiedBotData?.username || b.username } : b) }); 
+              showToast('Налаштування збережено'); 
+          } else { 
+              saveStateToDb({ bots: [...bots, { id: Date.now(), userId: currentUser.id, ...botDataToSave, username: verifiedBotData?.username || 'new_bot', status: 'Активний', users: 0, interactions: 0, uniqueUserIds: [] }] }); 
+              showToast('Бота створено!'); 
+          } 
+          setIsSaving(false); 
+          setIsBuilderOpen(false); 
+      }, 600); 
+  };
+  
+  // ✅ ОНОВЛЕНО: Тепер кнопка просто змінює статус в БД, а Модуль 5 сам підхоплює його і запускає поллінг
   const toggleBotStatus = async (id) => { 
       const bot = bots.find(b => b.id === id);
       const newStatus = bot.status === 'Активний' ? 'Пауза' : 'Активний'; 
-      
-      // АВТОМАТИЧНЕ ПІДКЛЮЧЕННЯ ДО СЕРВЕРА (Vercel Webhooks)
-      const serverUrl = window.location.origin; // Отримуємо URL сайту (напр. https://bots.vercel.app)
-      
-      try {
-          if (newStatus === 'Активний') {
-              if (bot.tokenFunnel) await fetch(`https://api.telegram.org/bot${bot.tokenFunnel}/setWebhook?url=${serverUrl}/api/webhook?botId=${bot.id}&type=funnel`);
-              if (bot.tokenLm) await fetch(`https://api.telegram.org/bot${bot.tokenLm}/setWebhook?url=${serverUrl}/api/webhook?botId=${bot.id}&type=lm`);
-              showToast('Бота запущено на сервері (24/7) 🚀', 'success');
-          } else {
-              if (bot.tokenFunnel) await fetch(`https://api.telegram.org/bot${bot.tokenFunnel}/deleteWebhook`);
-              if (bot.tokenLm) await fetch(`https://api.telegram.org/bot${bot.tokenLm}/deleteWebhook`);
-              showToast('Бота зупинено', 'info');
-          }
-      } catch (error) {
-          console.error("Webhook Error:", error);
-      }
-      
       saveStateToDb({ bots: bots.map(b => b.id === id ? { ...b, status: newStatus } : b) }); 
+      if (newStatus === 'Активний') {
+          showToast('Бота запущено! Локальний рушій платформи активовано 🚀', 'success');
+      } else {
+          showToast('Бота зупинено', 'info');
+      }
   };
 
   const getStepPreviewLabel = (step, idx) => { if (!step) return `Блок ${idx + 1}`; if (step.type === 'message') return `[Повідомлення] ${step.text ? step.text.substring(0, 15) + '...' : 'Медіа...'}`; if (step.type === 'wait_input') return `[Очікування] ${step.expectedText || 'тексту'}`; if (step.type === 'check_sub') return `[Підписка]`; if (step.type === 'delay') return `[Таймер]`; return `Блок ${idx + 1}`; };
@@ -1136,6 +1151,7 @@ export default function App() {
   const saveCookieSettings = () => { setCookieConsent(cookieTempSettings); setIsCookieSettingsOpen(false); setIsCookieNoticeOpen(false); showToast('Налаштування cookies збережені'); };
 
   const activeLmFlow = builderForm.moduleConfigs['Лід-магніт']?.flows?.find(f => f.id === activeFlowId) || null;
+
 
   // ============================================================================
   // 📦 МОДУЛЬ 9: ВІЗУАЛЬНА ЧАСТИНА (RENDER HTML / ІНТЕРФЕЙС)
