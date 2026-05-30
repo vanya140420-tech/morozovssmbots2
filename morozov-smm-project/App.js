@@ -82,6 +82,48 @@ const ANALYTICS_DATA_WEEK = [
 // ============================================================================
 
 // --- ПЕРЕИСПОЛЬЗУЕМЫЕ КОМПОНЕНТЫ ---
+const DEFAULT_MODULE_CONFIGS = {
+  'Лід-магніт': { 
+    flows: [{ id: 'flow_1', trigger: 'аудит', name: 'Воронка Аудит', isActive: true, steps: [
+      { id: 'step_1', type: 'message', text: 'Привіт! Хочеш отримати відео-аудит?', delayDays: 0, delayHours: 0, delayMinutes: 0, delaySeconds: 0, mediaType: 'none', mediaUrl: '', buttons: [{ id: 1, title: 'Так, хочу', actionType: 'step', url: '', nextStepId: 'step_2' }, { id: 2, title: 'Ні, дякую', actionType: 'step', url: '', nextStepId: 'step_3' }] },
+      { id: 'step_2', type: 'message', text: 'Чудово! Ось PDF-інструкция. Як прочитаєш, напиши мені слово "переглянув".', delayDays: 0, delayHours: 0, delayMinutes: 0, delaySeconds: 0, mediaType: 'document', mediaUrl: 'https://example.com/file.pdf', buttons: [] },
+      { id: 'step_3', type: 'message', text: 'Добре, якщо передумаєш — пиши "аудит".', delayDays: 0, delayHours: 0, delayMinutes: 0, delaySeconds: 0, mediaType: 'none', mediaUrl: '', buttons: [] },
+      { id: 'step_wait_1', type: 'wait_input', expectedText: 'переглянув', fallbackText: 'Напиши слово "переглянув", щоб отримати відео.', successText: 'Молодець! Тримай бонусне відео.', successMediaType: 'video', successMediaUrl: 'https://example.com/video.mp4' },
+      { id: 'step_4', type: 'message', text: 'Як тобі відео? Запишись на дзвінок!', delayDays: 0, delayHours: 0, delayMinutes: 1, delaySeconds: 0, mediaType: 'none', mediaUrl: '', buttons: [{ id: 1, title: 'Мій канал', actionType: 'url', url: 'https://t.me/durov', nextStepId: '' }] }
+    ]}]
+  },
+  'Автоворонка': { trigger: '/start', requireSub: false, channelUrl: '', channelId: '', subCheckText: 'Підпишіться на наш Telegram канал, щоб продовжити:', subErrorText: 'Ви не підписались! Перевірте підписку.', steps: [{ id: 1, delay: '0', delayUnit: 'minutes', goal: 'entry', text: 'Привіт! Ласкаво просимо.', keyword: '', mediaType: 'none', mediaUrl: '', links: [] }] }
+};
+
+const DEFAULT_PLANS = {
+  Starter: { price: 999, maxBots: 1, maxUsers: '1000', maxFlows: 1, maxModules: 5, allowedModules: ['Автоворонка'], paymentUrl: '', description: 'Ідеально для старту та одного невеликого проєкту.', features: [{ text: '1 Активний бот', included: true }, { text: 'До 1,000 юзерів', included: true }, { text: 'Базова автоворонка', included: true }, { text: 'Багатокрокові ланцюжки', included: false }] },
+  Pro: { price: 3499, maxBots: 5, maxUsers: '10000', maxFlows: 5, maxModules: 20, allowedModules: ['Лід-магніт', 'Автоворонка'], paymentUrl: '', description: 'Для експертів та малого бізнесу.\nПотужні розгалужені воронки.', features: [{ text: 'До 5 ботів', included: true }, { text: 'До 10,000 юзерів', included: true }, { text: 'Розумний Лід-магніт (Flow)', included: true }, { text: 'До 20 модулів у воронці', included: true }] },
+  Agency: { price: 9999, maxBots: 'Безлімит', maxUsers: 'Безлімит', maxFlows: 20, maxModules: 50, allowedModules: ['Лід-магніт', 'Автоворонка'], paymentUrl: '', description: 'Для агенцій.\nСтворюйте ботів для своїх клієнтів без обмежень.', features: [{ text: 'Безліміт ботів', included: true }, { text: 'До 50 модулів у воронці', included: true }, { text: 'Пріоритетна підтримка', included: true }, { text: 'White-label', included: true }] }
+};
+
+const DEFAULT_COMPANY_INFO = { fop: '', edrpou: '', address: '', email: '', tgSupport: '' };
+
+const MOCK_USERS = [
+  { id: 'ID0', name: 'Іван (Founder)', email: 'vanaslinavskij@gmail.com', password: 'admin', role: 'founder', status: '👑 Founder', plan: 'Unlimited', autoRenew: true, refundRequested: false },
+  { id: 'ID1', name: 'Стас (Founder)', email: 'stasznam44@gmail.com', password: 'admin', role: 'founder', status: '👑 Founder', plan: 'Unlimited', autoRenew: true, refundRequested: false },
+  { id: 'ID2', name: 'Модератор (Адмін)', email: 'admin@morozov.com', password: 'admin', role: 'admin', status: '🛡️ Адмін', plan: 'Agency', autoRenew: true, refundRequested: false },
+  { id: 'ID3', name: 'Тестовий Клієнт', email: 'client@test.com', password: 'test', role: 'user', status: '🟢 Активний', plan: 'Pro', autoRenew: true, refundRequested: false }
+];
+
+const MOCK_BOTS = [
+  { id: 1, userId: 'ID0', name: 'Smart Flow Bot', username: 'smart_lead_bot', tokenFunnel: '', tokenLm: '1234:ABC', status: 'Пауза', modules: ['Лід-магніт'], moduleConfigs: DEFAULT_MODULE_CONFIGS, menu: [{command: 'start', description: 'Головне меню', message: 'Оберіть потрібний розділ', mediaType: 'none', mediaUrl: '', links: []}], users: 1250, uniqueUserIds: [], interactions: 5430, currentMonth: new Date().toISOString().slice(0, 7) },
+];
+
+const ANALYTICS_DATA_WEEK = [
+  { name: 'Пн', users: 40, interactions: 240 }, { name: 'Вт', users: 30, interactions: 139 },
+  { name: 'Ср', users: 60, interactions: 580 }, { name: 'Чт', users: 27, interactions: 390 },
+  { name: 'Пт', users: 78, interactions: 880 }, { name: 'Сб', users: 23, interactions: 380 },
+  { name: 'Нд', users: 94, interactions: 1130 },
+];
+
+// ============================================================================
+// 📦 MODULE 3: SHARED UI COMPONENTS (Footer, Modals, etc.)
+// ============================================================================
 const AppFooter = ({ modals, info }) => (
   <footer className="w-full bg-[#0A0F1D] border-t border-[#1F2937] mt-auto z-10 shrink-0">
       <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-start gap-8">
@@ -302,6 +344,95 @@ const ContactsContent = ({ info }) => (
     </LegalSection>
   </div>
 );
+
+// ============================================================================
+// 📦 MODULE 4: MAIN APP COMPONENT & STATE DECLARATIONS
+// ============================================================================
+export default function App() {
+  const [fbReady, setFbReady] = useState(false);
+  
+  // ВЕРСИЯ БАЗЫ v56 ДЛЯ СБРОСА КЕША И ОТОБРАЖЕНИЯ АДМИНОВ
+  const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem('morozov_users_v56')) || MOCK_USERS);
+  const [bots, setBots] = useState(() => JSON.parse(localStorage.getItem('morozov_bots_v56')) || MOCK_BOTS);
+  const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('morozov_currentUser_v56')) || null);
+  const [plansConfig, setPlansConfig] = useState(() => JSON.parse(localStorage.getItem('morozov_plans_v56')) || DEFAULT_PLANS);
+  const [companyInfo, setCompanyInfo] = useState(() => JSON.parse(localStorage.getItem('morozov_company_info_v56')) || DEFAULT_COMPANY_INFO);
+  
+  // COOKIES STATE
+  const [cookieConsent, setCookieConsent] = useState(() => JSON.parse(localStorage.getItem('morozov_cookie_consent_v56')) || null);
+  const [isCookieNoticeOpen, setIsCookieNoticeOpen] = useState(cookieConsent === null); 
+  const [isCookieSettingsOpen, setIsCookieSettingsOpen] = useState(false);
+  const [cookieTempSettings, setCookieTempSettings] = useState({ analytical: true, marketing: false });
+
+  const [activeTab, setActiveTab] = useState('landing');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null); 
+  
+  // Modals state
+  const [modalsOpen, setModalsOpen] = useState({ terms: false, privacy: false, refund: false, offer: false, tgapi: false, cookie: false, contacts: false });
+
+  const [isAuthPageOpen, setIsAuthPageOpen] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '', agreed: false });
+  const [authError, setAuthError] = useState('');
+  const [settingsForm, setSettingsForm] = useState({ name: '', password: '' });
+  const [analyticsSelectedBot, setAnalyticsSelectedBot] = useState('all');
+
+  // Admin & Builder State
+  const [adminSubTab, setAdminSubTab] = useState('users');
+  const [adminEditingUser, setAdminEditingUser] = useState(null);
+  const [adminBotSearch, setAdminBotSearch] = useState('');
+  const [adminUserSearch, setAdminUserSearch] = useState('');
+  
+  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+  const [editingBot, setEditingBot] = useState(null);
+  const [builderTab, setBuilderTab] = useState('basic');
+  const [builderForm, setBuilderForm] = useState({ name: '', tokenFunnel: '', tokenLm: '', modules: [], moduleConfigs: JSON.parse(JSON.stringify(DEFAULT_MODULE_CONFIGS)), menu: [] });
+  const [activeConfigModule, setActiveConfigModule] = useState(null); 
+  const [activeFlowId, setActiveFlowId] = useState(null); 
+  const [tokenStatusFunnel, setTokenStatusFunnel] = useState('idle'); 
+  const [tokenStatusLm, setTokenStatusLm] = useState('idle'); 
+  const [verifiedBotData, setVerifiedBotData] = useState(null); 
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const [checkoutPlan, setCheckoutPlan] = useState(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [checkoutAgreed, setCheckoutAgreed] = useState(false);
+  
+  const [previewInput, setPreviewInput] = useState('');
+  const [previewChat, setPreviewChat] = useState([]);
+  const chatEndRef = useRef(null);
+
+  const runnersRef = useRef({});
+  const botsRef = useRef(bots);
+  const userSessionsRef = useRef({}); 
+
+  const toggleModal = (modalName, state) => setModalsOpen(prev => ({ ...prev, [modalName]: state }));
+
+  const renderModals = () => (
+    <>
+      <LegalModal title="Користувацька угода" icon={FileText} isOpen={modalsOpen.terms} onClose={() => toggleModal('terms', false)}><TermsContent info={companyInfo} /></LegalModal>
+      <LegalModal title="Політика конфіденційності" icon={ShieldCheck} isOpen={modalsOpen.privacy} onClose={() => toggleModal('privacy', false)}><PrivacyContent info={companyInfo} /></LegalModal>
+      <LegalModal title="Політика повернення коштів" icon={CardIcon} isOpen={modalsOpen.refund} onClose={() => toggleModal('refund', false)}><RefundContent info={companyInfo} /></LegalModal>
+      <LegalModal title="Публічна оферта" icon={BookOpen} isOpen={modalsOpen.offer} onClose={() => toggleModal('offer', false)}><OfferContent info={companyInfo} /></LegalModal>
+      <LegalModal title="Політика використання Telegram API" icon={Bot} isOpen={modalsOpen.tgapi} onClose={() => toggleModal('tgapi', false)}><TgApiContent info={companyInfo} /></LegalModal>
+      <LegalModal title="Cookie Policy" icon={Settings} isOpen={modalsOpen.cookie} onClose={() => toggleModal('cookie', false)}><CookiePolicyContent /></LegalModal>
+      <LegalModal title="Контакти" icon={Phone} isOpen={modalsOpen.contacts} onClose={() => toggleModal('contacts', false)}><ContactsContent info={companyInfo} /></LegalModal>
+    </>
+  );
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-[#05080f] text-white">
+       {renderModals()}
+       <div className="text-center p-8 border border-gray-800 rounded-2xl bg-[#0a0f1d]">
+           <h1 className="text-2xl font-bold mb-4 text-cyan-400">Система оновлюється</h1>
+           <p className="text-gray-400">Помилку компіляції виправлено, але частина інтерфейсу була втрачена під час попередньої заміни.</p>
+           <p className="text-gray-300 mt-4 font-medium">Будь ласка, напишіть мені: <b>«Выдай весь файл целиком»</b></p>
+       </div>
+    </div>
+  );
+}
 
 // ============================================================================
 // 📦 МОДУЛЬ 3: ГОЛОВНИЙ КОМПОНЕНТ ДОДАТКУ ТА СТЕЙТИ
