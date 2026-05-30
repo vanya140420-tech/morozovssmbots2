@@ -2576,3 +2576,16 @@ export default function App() {
     </div>
   );
 }
+// --- АВТОМАТИЧНИЙ ЗАПУСК ДЛЯ VERCEL ---
+// Цей блок коду дає команду браузеру намалювати інтерфейс на реальному сайті.
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  setTimeout(() => {
+    const rootElement = document.getElementById('root');
+    // Перевіряємо, чи корінь порожній (щоб не малювати двічі)
+    if (rootElement && rootElement.childElementCount === 0) {
+      import('react-dom/client').then(({ createRoot }) => {
+        createRoot(rootElement).render(<App />);
+      }).catch(err => console.error("Помилка рендерингу:", err));
+    }
+  }, 100);
+}
