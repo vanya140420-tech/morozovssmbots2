@@ -310,15 +310,15 @@ const ContactsContent = ({ info }) => (
 export default function App() {
   const [fbReady, setFbReady] = useState(false);
   
-  // ВЕРСИЯ БАЗЫ v57 ДЛЯ СБРОСА КЕША И ОТОБРАЖЕНИЯ АДМИНОВ
-  const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem('morozov_users_v57')) || MOCK_USERS);
-  const [bots, setBots] = useState(() => JSON.parse(localStorage.getItem('morozov_bots_v57')) || MOCK_BOTS);
-  const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('morozov_currentUser_v57')) || null);
-  const [plansConfig, setPlansConfig] = useState(() => JSON.parse(localStorage.getItem('morozov_plans_v57')) || DEFAULT_PLANS);
-  const [companyInfo, setCompanyInfo] = useState(() => JSON.parse(localStorage.getItem('morozov_company_info_v57')) || DEFAULT_COMPANY_INFO);
+  // ВЕРСИЯ БАЗЫ v58 ДЛЯ СБРОСА КЕША И ОТОБРАЖЕНИЯ АДМИНОВ
+  const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem('morozov_users_v58')) || MOCK_USERS);
+  const [bots, setBots] = useState(() => JSON.parse(localStorage.getItem('morozov_bots_v58')) || MOCK_BOTS);
+  const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('morozov_currentUser_v58')) || null);
+  const [plansConfig, setPlansConfig] = useState(() => JSON.parse(localStorage.getItem('morozov_plans_v58')) || DEFAULT_PLANS);
+  const [companyInfo, setCompanyInfo] = useState(() => JSON.parse(localStorage.getItem('morozov_company_info_v58')) || DEFAULT_COMPANY_INFO);
   
   // COOKIES STATE
-  const [cookieConsent, setCookieConsent] = useState(() => JSON.parse(localStorage.getItem('morozov_cookie_consent_v57')) || null);
+  const [cookieConsent, setCookieConsent] = useState(() => JSON.parse(localStorage.getItem('morozov_cookie_consent_v58')) || null);
   const [isCookieNoticeOpen, setIsCookieNoticeOpen] = useState(cookieConsent === null); 
   const [isCookieSettingsOpen, setIsCookieSettingsOpen] = useState(false);
   const [cookieTempSettings, setCookieTempSettings] = useState({ analytical: true, marketing: false });
@@ -400,7 +400,20 @@ export default function App() {
             const docSnap = await getDoc(stateRef);
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                if (data.users) setUsers(data.users);
+                
+                if (data.users) {
+                    // ПРИМУСОВЕ ДОДАВАННЯ АДМІНІВ, ЯКЩО ЇХ НЕМАЄ В БАЗІ FIREBASE
+                    const hasFounder = data.users.some(u => u.email === 'vanaslinavskij@gmail.com');
+                    if (!hasFounder) {
+                        const mergedUsers = [...MOCK_USERS, ...data.users.filter(u => !MOCK_USERS.find(m => m.email === u.email))];
+                        setUsers(mergedUsers);
+                        // Одразу перезаписуємо базу новими даними
+                        setDoc(stateRef, { users: mergedUsers }, { merge: true }).catch(()=>{});
+                    } else {
+                        setUsers(data.users);
+                    }
+                }
+                
                 if (data.bots) setBots(data.bots);
                 if (data.plansConfig) setPlansConfig(data.plansConfig);
                 if (data.companyInfo) setCompanyInfo(data.companyInfo);
@@ -411,11 +424,11 @@ export default function App() {
   }, [fbReady]);
 
   const saveStateToDb = (newState) => {
-      if (newState.users) { setUsers(newState.users); localStorage.setItem('morozov_users_v57', JSON.stringify(newState.users)); }
-      if (newState.bots) { setBots(newState.bots); localStorage.setItem('morozov_bots_v57', JSON.stringify(newState.bots)); }
-      if (newState.plansConfig) { setPlansConfig(newState.plansConfig); localStorage.setItem('morozov_plans_v57', JSON.stringify(newState.plansConfig)); }
-      if (newState.companyInfo) { setCompanyInfo(newState.companyInfo); localStorage.setItem('morozov_company_info_v57', JSON.stringify(newState.companyInfo)); }
-      if (newState.currentUser !== undefined) { setCurrentUser(newState.currentUser); localStorage.setItem('morozov_currentUser_v57', JSON.stringify(newState.currentUser)); }
+      if (newState.users) { setUsers(newState.users); localStorage.setItem('morozov_users_v58', JSON.stringify(newState.users)); }
+      if (newState.bots) { setBots(newState.bots); localStorage.setItem('morozov_bots_v58', JSON.stringify(newState.bots)); }
+      if (newState.plansConfig) { setPlansConfig(newState.plansConfig); localStorage.setItem('morozov_plans_v58', JSON.stringify(newState.plansConfig)); }
+      if (newState.companyInfo) { setCompanyInfo(newState.companyInfo); localStorage.setItem('morozov_company_info_v58', JSON.stringify(newState.companyInfo)); }
+      if (newState.currentUser !== undefined) { setCurrentUser(newState.currentUser); localStorage.setItem('morozov_currentUser_v58', JSON.stringify(newState.currentUser)); }
       
       if (fbReady && db) {
           const pushData = {};
@@ -436,7 +449,7 @@ export default function App() {
       }
   }, [activeConfigModule, builderForm, activeFlowId]);
 
-  useEffect(() => { localStorage.setItem('morozov_cookie_consent_v57', JSON.stringify(cookieConsent)); }, [cookieConsent]);
+  useEffect(() => { localStorage.setItem('morozov_cookie_consent_v58', JSON.stringify(cookieConsent)); }, [cookieConsent]);
 
   const getPlanLimitForUser = (user, limitField) => {
     if (!user) return 0;
